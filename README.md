@@ -50,7 +50,7 @@ Everything is in `public/js/config.js`:
 - `copy.*`: screen text, footer, cookie bar, PDF text
 - `links`: EDGE URL + UTM parameters, legal links
 
-Replace `public/assets/ten-logo-black.svg`, `og-image.png` (1200×630), `favicon.svg`, `favicon.png`
+Replace `public/assets/ten-logo-black.png`, `og-image.png` (1200×630), `favicon.svg`, `favicon.png`
 (32×32) and `apple-touch-icon.png` (180×180), keeping the same filenames.
 
 ## Launch checklist

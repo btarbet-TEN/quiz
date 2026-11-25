@@ -32,7 +32,7 @@ async function fetchBase64(url) {
   return btoa(binary);
 }
 
-// Rasterize the (SVG) logo to PNG, since jsPDF can't draw SVG directly.
+// Normalize the logo to a PNG data URL for jsPDF.
 async function rasterizeLogo(src) {
   const text = await (await fetch(src)).text();
   const vb = /viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/.exec(text);

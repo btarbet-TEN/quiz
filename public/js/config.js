@@ -12,7 +12,7 @@ export const CONFIG = {
   site: {
     title: 'Your Elementary Music Success Scorecard | TEN',
     brandUrl: 'https://tarbeteducationnetwork.com',
-    logoSrc: '/assets/ten-logo-black.svg',
+    logoSrc: '/assets/ten-logo-black.png',
     logoAlt: 'Tarbet Education Network',
   },
 
@@ -120,11 +120,10 @@ export const CONFIG = {
     cookie: {
       text: 'This site uses cookies to improve your experience and measure our marketing.',
       linkText: 'Privacy Policy',
-      button: 'Got it',
+      button: 'Got It',
     },
     footer: {
-      // {year} is replaced with the current year.
-      copyright: '© {year} That Music Teacher, LLC d/b/a Tarbet Education Network. All rights reserved.',
+      copyright: '© Tarbet Education Network',
       trademark: 'Elementary Music EDGE® is a registered trademark of That Music Teacher, LLC.',
     },
     pdf: {

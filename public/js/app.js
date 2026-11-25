@@ -20,7 +20,6 @@ const COMPACT_CHART_MQ = window.matchMedia('(max-width: 599px)');
 
 const $main = document.getElementById('main');
 const $status = document.getElementById('sr-status');
-const year = new Date().getFullYear();
 
 // ---------------------------------------------------------------------------
 // State
@@ -123,7 +122,7 @@ function results() {
 // ---------------------------------------------------------------------------
 function renderLogo() {
   const slot = document.getElementById('logo-slot');
-  const img = `<img src="${esc(CONFIG.site.logoSrc)}" alt="${esc(CONFIG.site.logoAlt)}" width="120" height="34">`;
+  const img = `<img src="${esc(CONFIG.site.logoSrc)}" alt="${esc(CONFIG.site.logoAlt)}" width="120" height="42">`;
   // Not a link during the quiz; on results it links to the TEN site in a new tab (keeps results open).
   slot.innerHTML = state.screen === 'results'
     ? `<a class="logo" href="${esc(CONFIG.site.brandUrl)}" target="_blank" rel="noopener">${img}</a>`
@@ -137,7 +136,7 @@ function renderFooter() {
   const link = (href, text) => `<a href="${esc(href)}"${href.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}>${esc(text)}</a>`;
   document.getElementById('site-footer').innerHTML = `
     <div class="site-footer__inner">
-      <p>${esc(f.copyright.replace('{year}', year))}</p>
+      <p>${esc(f.copyright)}</p>
       <p>${esc(f.trademark)}</p>
       <nav aria-label="Legal">
         ${link(L.privacy, 'Privacy Policy')}<span aria-hidden="true">|</span>
@@ -187,7 +186,7 @@ function introHtml() {
   const c = CONFIG.copy.intro;
   return `
     <section class="screen screen--intro intro" aria-labelledby="screen-heading">
-      <img class="intro__logo" src="${esc(CONFIG.site.logoSrc)}" alt="${esc(CONFIG.site.logoAlt)}" width="220" height="62">
+      <img class="intro__logo" src="${esc(CONFIG.site.logoSrc)}" alt="${esc(CONFIG.site.logoAlt)}" width="220" height="77">
       <h1 id="screen-heading" class="intro__title" tabindex="-1">${esc(c.heading)}</h1>
       <div class="intro__panel"><p>${esc(c.body)}</p></div>
       <button type="button" class="btn" data-action="start">${esc(c.button)}</button>
