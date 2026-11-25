@@ -18,7 +18,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 ## What's built
 
 ### User flow
-1. **Intro.** Logo, "Your Elementary Music Success Scorecard" and the approved intro copy, with a **Start My Scorecard** button.
+1. **Intro.** Logo, "Your Elementary Music Success Scorecard" and the approved intro copy, with a **Start My Free Audit** button.
 2. **Before you begin.** Explains the Pillars framework and the five pillars, then **how it works** (3 steps), with Back and **Let's Begin** buttons.
 3. **Five pillar pages,** one per pillar in framework order, each with 5 statements rated 1–5. A progress bar shows "Pillar X of 5". **Next** stays disabled until all 5 are answered, **Back** keeps answers, and a refresh doesn't lose progress.
 4. **Email gate.** "Your results are ready." The Flodesk form for the person's **growth pillar** is embedded here.

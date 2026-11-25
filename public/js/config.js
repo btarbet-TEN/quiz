@@ -60,14 +60,14 @@ export const CONFIG = {
   copy: {
     intro: {
       // Approved copy: use exactly.
-      heading: 'Your Elementary Music Success Scorecard',
+      heading: ['Your Elementary Music', 'Success Scorecard'],
       body: 'Discover your Growth Pillar: the one area of the Pillars of General Music Success that will make the biggest difference in your teaching right now.',
-      button: 'Start My Scorecard',
+      button: 'Start My Free Audit',
     },
     // Shown after the intro, before Pillar 1.
     about: {
       eyebrow: 'Before you begin',
-      heading: 'The Pillars of General Music Success',
+      heading: 'What Are the Pillars of General Music Success?',
       paragraphs: [
         'The Pillars of General Music Success are the five non-negotiable areas where every elementary music teacher needs to keep growing to avoid burnout and truly thrive in this work.',
         "This framework isn't theory. It was built through deep work with music teachers around the world to pinpoint exactly where the time-wasting, frustration and overwhelm really come from.",

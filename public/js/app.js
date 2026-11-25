@@ -185,7 +185,7 @@ function introHtml() {
   return `
     <section class="screen screen--intro intro" aria-labelledby="screen-heading">
       <img class="intro__logo" src="${esc(CONFIG.site.logoSrc)}" alt="${esc(CONFIG.site.logoAlt)}" width="220" height="77">
-      <h1 id="screen-heading" class="intro__title" tabindex="-1">${esc(c.heading)}</h1>
+      <h1 id="screen-heading" class="intro__title" tabindex="-1">${c.heading.map((line) => `<span>${esc(line)}</span>`).join(' ')}</h1>
       <div class="intro__panel"><p>${esc(c.body)}</p></div>
       <button type="button" class="btn" data-action="start">${esc(c.button)}</button>
     </section>`;
@@ -364,8 +364,7 @@ function resultsHtml() {
         <h2 id="download-h">${esc(c.downloadHeading)}</h2>
         <div class="field">
           <label for="print-name">${esc(c.nameFieldLabel)}</label>
-          <input id="print-name" type="text" autocomplete="name" maxlength="${NAME_MAX}" value="${esc(gateFirstName.slice(0, NAME_MAX))}" aria-describedby="print-name-count">
-          <small id="print-name-count" class="field__count" data-name-count>${gateFirstName.slice(0, NAME_MAX).length}/${NAME_MAX}</small>
+          <input id="print-name" type="text" autocomplete="name" maxlength="${NAME_MAX}" value="${esc(gateFirstName.slice(0, NAME_MAX))}">
         </div>
         <button type="button" class="btn" data-action="download">${esc(c.downloadButton)}</button>
         <p class="download-status" data-download-status role="status"></p>
@@ -440,7 +439,7 @@ function render({ focus = true } = {}) {
   }
 
   const announcements = {
-    intro: CONFIG.copy.intro.heading,
+    intro: CONFIG.copy.intro.heading.join(' '),
     about: CONFIG.copy.about.heading,
     question: `Pillar ${state.step + 1} of ${PILLARS.length}: ${PILLARS[state.step].name}`,
     gate: CONFIG.copy.gate.heading,
@@ -595,13 +594,6 @@ function bindResults() {
       btn.disabled = false;
     }
   });
-
-  const nameInput = $main.querySelector('#print-name');
-  const nameCount = $main.querySelector('[data-name-count]');
-  nameInput.addEventListener('input', () => { nameCount.textContent = `${nameInput.value.length}/${NAME_MAX}`; });
-
-  // Retake asks first, since it wipes the saved results.
-
 }
 
 // Intro start button (delegated so it survives re-renders).
