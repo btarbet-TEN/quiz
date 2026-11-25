@@ -29,7 +29,7 @@ const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.ttf': 'font/ttf', '.woff2': 'font/woff2', '.json': 'application/json',
 };
-// Send the same headers Vercel would (vercel.json), so CSP report-only violations show up here too.
+// Send the same headers Vercel would (vercel.json), so CSP violations show up here too.
 const vercel = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'));
 const headersFor = (pathname) => Object.fromEntries((vercel.headers || [])
   .filter((rule) => new RegExp(`^${rule.source}$`).test(pathname))
@@ -279,7 +279,7 @@ await recovery.close();
 
 await browser.close();
 server.close();
-console.log(cspViolations.size ? `\nCSP report-only violations:\n- ${[...cspViolations].join('\n- ')}` : '\nNo CSP report-only violations.');
+console.log(cspViolations.size ? `\nCSP violations:\n- ${[...cspViolations].join('\n- ')}` : '\nNo CSP violations.');
 console.log(problems.length ? `\nIssues:\n- ${problems.join('\n- ')}` : '\nNo issues found.');
 console.log(`Screenshots in ${outDir}`);
 

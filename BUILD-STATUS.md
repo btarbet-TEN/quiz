@@ -80,7 +80,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 
 ### Security
 - **Headers on every page:** `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy` and `Permissions-Policy`.
-- **Content-Security-Policy in report-only mode.** It doesn't block anything yet; violations only show in the browser console. See CLAUDE.md for the full policy.
+- **Content-Security-Policy is enforced in the audit build.** The policy allows the quiz and Flodesk. Verify and allow tracker origins before enabling a tracker.
 - **`ten-pillar-quiz.vercel.app` redirects** to `audit.thatmusicteacher.com`, so there's no second public copy.
 
 ### Other
@@ -141,7 +141,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 - [ ] **GA4 Measurement ID** added
 - [ ] **Microsoft Clarity ID** added, with masking set to **Strict** in the Clarity dashboard
 - [ ] **Meta Events Manager:** Automatic Advanced Matching turned **off** for the pixel
-- [ ] **Switch the CSP from report-only to enforced** after checking a real Flodesk submission and PDF in preview. Retest the policy separately for each tracker before enabling it
+- [x] **Enforce the CSP in the audit build** after checking a real Flodesk submission and PDF at the preview origin. Retest before enabling each tracker.
 - [ ] **Real logo, OG image and favicon** added
 - [ ] **Real copy** for each pillar's foundation and growth text replaced in `public/js/config.js`
 - [ ] **15 real recommended trainings** (3 per pillar: title, clinician, one-line description)

@@ -172,14 +172,10 @@ notice, not a consent gate (dismissal stored in `localStorage` key `ten-cookie-n
 
 All paths get `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`,
 `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `X-Frame-Options: DENY`, and a
-**report-only** `Content-Security-Policy-Report-Only` (nothing is blocked yet; violations only show in
-the browser console). The policy allows self, Flodesk (`assets.flodesk.com`, `*.flodesk.com`) and the
-Meta Pixel, GA4 and Clarity origins; `img-src` includes `data:`/`blob:` (PDF logo), `style-src` has
-`'unsafe-inline'` (inline style attributes); `frame-ancestors 'none'`, `base-uri 'self'`,
-`object-src 'none'`, `form-action 'self' https://*.flodesk.com`. There are no inline scripts (keep it
-that way, so no hashes are needed). `npm run screenshots` serves vercel.json's headers locally and lists
-any report-only violations. Before switching to an enforced `Content-Security-Policy`, check the console
-on the live site with all tracker IDs set and the real Flodesk form loaded.
+browser-enforced `Content-Security-Policy`. The policy allows the site and Flodesk. The PDF
+requires `data:` and `blob:` images, and inline styles support the score bars and form.
+The browser test serves the same headers and fails on policy violations. Before enabling a
+tracker, validate its required origins in a preview and update the policy and tracker ID together.
 
 `ten-pillar-quiz.vercel.app` 308-redirects (same path) to `https://audit.thatmusicteacher.com`, so the
 default Vercel domain doesn't serve a second copy. Preview-deployment URLs are not redirected.
