@@ -9,12 +9,13 @@
 
 export const STATEMENTS_PER_PILLAR = 5;
 
-/** Sum each pillar's ratings. `answers` maps slug -> array of 1–5 (or null). */
+/** Sum each pillar's ratings. `answers` maps slug -> array of five integers from 1–5. */
 export function scorePillars(answers, slugs) {
+  if (slugs.length < 2) throw new RangeError('At least two pillars are required');
   const scores = {};
   for (const slug of slugs) {
-    const ratings = answers[slug] || [];
-    scores[slug] = ratings.reduce((sum, r) => sum + (Number(r) || 0), 0);
+    if (!isPillarComplete(answers, slug)) throw new RangeError(`Invalid ratings for ${slug}`);
+    scores[slug] = answers[slug].reduce((sum, rating) => sum + rating, 0);
   }
   return scores;
 }
@@ -22,8 +23,8 @@ export function scorePillars(answers, slugs) {
 /** True when every statement for the pillar has a 1–5 rating. */
 export function isPillarComplete(answers, slug) {
   const ratings = answers[slug] || [];
-  if (ratings.length < STATEMENTS_PER_PILLAR) return false;
-  return ratings.slice(0, STATEMENTS_PER_PILLAR).every((r) => Number.isInteger(r) && r >= 1 && r <= 5);
+  if (!Array.isArray(ratings) || ratings.length !== STATEMENTS_PER_PILLAR) return false;
+  return Array.from(ratings).every((r) => Number.isInteger(r) && r >= 1 && r <= 5);
 }
 
 /**

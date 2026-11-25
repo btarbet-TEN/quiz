@@ -75,7 +75,7 @@
    Self-hosted so headings stay heavy even if Google Fonts is blocked. */
 @font-face {
   font-family: "Archivo Black";
-  src: url("/fonts/ArchivoBlack-Regular.ttf") format("truetype");
+  src: url("/fonts/ArchivoBlack-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -628,10 +628,6 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
 .field small { color: var(--grey); font-size: 0.875rem; }
 .field__count { justify-self: end; font-variant-numeric: tabular-nums; }
 .download-status { min-height: 1.5em; margin-top: 8px; color: var(--grey); font-size: 0.95rem; }
-.retake { margin-top: 24px; }
-.retake__confirm { background: var(--mint); border-radius: var(--radius); padding: 16px 18px; max-width: 520px; }
-.retake__confirm p { font-weight: 600; margin-bottom: 12px; }
-.retake__confirm .btn { margin: 0 8px 8px 0; min-height: 44px; }
 
 /* Growth / Foundation definitions and tie-break note under "Your Pillar Scores". */
 .score-legend { margin: 16px 0 0; display: grid; gap: 8px; font-size: 0.9rem; color: var(--grey); }

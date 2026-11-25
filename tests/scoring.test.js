@@ -117,3 +117,12 @@ test('isPillarComplete requires five 1–5 ratings', () => {
   assert.equal(isPillarComplete({ [EP]: [1, 2, 3, 4, 6] }, EP), false);
   assert.equal(isPillarComplete({}, EP), false);
 });
+
+test('results require complete, in-range integer ratings for at least two pillars', () => {
+  const answers = Object.fromEntries(ORDER.map((slug) => [slug, [1, 2, 3, 4, 5]]));
+  for (const invalid of [[1, 2, 3, 4, null], [1, 2, 3, 4, 6], [1, 2, 3, 4, '5'],
+    [1, 2, 3, 4, 5, 5], [1, 2, , 4, 5]]) {
+    assert.throws(() => computeResults({ ...answers, [EP]: invalid }, ORDER), RangeError);
+  }
+  assert.throws(() => computeResults(answers, []), RangeError);
+});

@@ -47,7 +47,7 @@ function loadState() {
   try {
     const saved = readSaved();
     if (!saved || typeof saved !== 'object') return;
-    if (saved.savedAt && Date.now() - saved.savedAt > STORAGE_MAX_AGE_MS) { clearState(); return; }
+    if (saved.savedAt != null && (!Number.isFinite(saved.savedAt) || Date.now() - saved.savedAt > STORAGE_MAX_AGE_MS)) { clearState(); return; }
     const answers = emptyAnswers();
     for (const slug of ORDER) {
       const arr = saved.answers && saved.answers[slug];
@@ -59,8 +59,8 @@ function loadState() {
       }
     }
     const screen = ['intro', 'about', 'question', 'gate', 'results'].includes(saved.screen) ? saved.screen : 'intro';
-    const step = Math.min(Math.max(Number(saved.step) || 0, 0), ORDER.length - 1);
-    state = { screen, step, answers, unlocked: Boolean(saved.unlocked) };
+    const step = Math.min(Math.max((Number.isInteger(saved.step) ? saved.step : 0), 0), ORDER.length - 1);
+    state = { screen, step, answers, unlocked: saved.unlocked === true };
   } catch (e) { /* storage blocked or corrupt: start fresh */ }
 }
 
@@ -84,6 +84,10 @@ function allowedScreen(screen, step) {
   if ((screen === 'gate' || screen === 'results') && !complete) {
     const firstIncomplete = ORDER.findIndex((s) => !isPillarComplete(state.answers, s));
     return { screen: 'question', step: Math.max(firstIncomplete, 0) };
+  }
+  if (screen === 'question') {
+    const firstIncomplete = ORDER.findIndex((slug) => !isPillarComplete(state.answers, slug));
+    if (firstIncomplete !== -1) step = Math.min(step, firstIncomplete);
   }
   if (screen === 'results' && !state.unlocked) return { screen: 'gate', step };
   if (screen === 'gate' && state.unlocked) return { screen: 'results', step };
@@ -281,6 +285,10 @@ function gateHtml() {
           <p>${esc(c.blockedMessage)}</p>
           <button type="button" class="btn" data-action="skip-gate">${esc(c.blockedButton)}</button>
         </div>
+        <div class="gate__blocked" data-gate-unconfirmed hidden>
+          <p role="status">${esc(c.unconfirmedMessage)}</p>
+          <button type="button" class="btn" data-action="show-unconfirmed-results">${esc(c.blockedButton)}</button>
+        </div>
       </div>
       <button type="button" class="link-btn" data-action="back">Back to the questions</button>
     </section>`;
@@ -366,14 +374,6 @@ function resultsHtml() {
         <p class="download-status" data-download-status role="status"></p>
       </section>
 
-      <div class="retake" data-retake>
-        <button type="button" class="link-btn" data-action="retake">${esc(c.retake)}</button>
-        <div class="retake__confirm" data-retake-confirm hidden>
-          <p>${esc(c.retakeConfirm)}</p>
-          <button type="button" class="btn" data-action="retake-yes">${esc(c.retakeYes)}</button>
-          <button type="button" class="btn btn--ghost" data-action="retake-no">${esc(c.retakeNo)}</button>
-        </div>
-      </div>
     </section>`;
 }
 
@@ -399,6 +399,7 @@ COMPACT_CHART_MQ.addEventListener?.('change', renderChart);
 function go(screen, step = state.step, { focus = true, history = 'push' } = {}) {
   if (gateCleanup) { gateCleanup(); gateCleanup = null; }
   ({ screen, step } = allowedScreen(screen, step));
+  if (state.screen === 'results' && screen !== 'results') gateFirstName = '';
   state.screen = screen;
   state.step = step;
   saveState();
@@ -446,7 +447,7 @@ function render({ focus = true } = {}) {
     about: CONFIG.copy.about.heading,
     question: `Pillar ${state.step + 1} of ${PILLARS.length}: ${PILLARS[state.step].name}`,
     gate: CONFIG.copy.gate.heading,
-    results: `Your results. Growth Pillar: ${BY_SLUG[results().growth].name}`,
+    results: state.screen === 'results' ? `Your results. Growth Pillar: ${BY_SLUG[results().growth].name}` : '',
   };
   if (focus) announce(announcements[state.screen]);
 }
@@ -526,6 +527,7 @@ function bindGate() {
   const host = $main.querySelector('[data-gate-form]');
   const loading = $main.querySelector('[data-gate-loading]');
   const blocked = $main.querySelector('[data-gate-blocked]');
+  const unconfirmed = $main.querySelector('[data-gate-unconfirmed]');
 
   const reveal = () => {
     state.unlocked = true;
@@ -547,7 +549,9 @@ function bindGate() {
       loading.hidden = true;
       blocked.hidden = false;
     },
-    onSuccess: (how, { firstName = '' } = {}) => {
+    onPending: () => { unconfirmed.hidden = true; },
+    onUnconfirmed: () => { unconfirmed.hidden = false; },
+    onSuccess: ({ firstName }) => {
       // Kept in memory only, to prefill the PDF name field. Never stored or sent to trackers.
       gateFirstName = firstName;
       // Pillar name only. Never the name/email typed into the form.
@@ -556,8 +560,11 @@ function bindGate() {
     },
   });
 
+  unconfirmed.querySelector('button').addEventListener('click', () => {
+    if (!unconfirmed.hidden) reveal();
+  });
   blocked.querySelector('[data-action="skip-gate"]').addEventListener('click', () => {
-    if (formRendered) return; // the form is available, so the skip no longer applies
+    if (formRendered || blocked.hidden) return; // the form is available, so the skip no longer applies
     reveal();
   });
   $main.querySelector('[data-action="back"]').addEventListener('click', () => go('question', PILLARS.length - 1));
@@ -597,22 +604,7 @@ function bindResults() {
   nameInput.addEventListener('input', () => { nameCount.textContent = `${nameInput.value.length}/${NAME_MAX}`; });
 
   // Retake asks first, since it wipes the saved results.
-  const retakeBtn = $main.querySelector('[data-action="retake"]');
-  const confirmBox = $main.querySelector('[data-retake-confirm]');
-  retakeBtn.addEventListener('click', () => {
-    retakeBtn.hidden = true;
-    confirmBox.hidden = false;
-    confirmBox.querySelector('[data-action="retake-no"]').focus();
-  });
-  confirmBox.querySelector('[data-action="retake-no"]').addEventListener('click', () => {
-    confirmBox.hidden = true;
-    retakeBtn.hidden = false;
-    retakeBtn.focus();
-  });
-  confirmBox.querySelector('[data-action="retake-yes"]').addEventListener('click', () => {
-    clearState();
-    go('intro', 0);
-  });
+
 }
 
 // Intro start button (delegated so it survives re-renders).

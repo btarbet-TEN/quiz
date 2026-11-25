@@ -36,8 +36,8 @@ export const CONFIG = {
     },
     // If the form hasn't rendered by then (e.g. an ad blocker), offer a way through.
     renderTimeoutMs: 6000,
-    // Only used when Flodesk gives no success signal after a submit.
-    submitFallbackMs: 1500,
+    // Offer a manual way through if Flodesk does not confirm a submission.
+    confirmationTimeoutMs: 8000,
   },
 
   // --- Links ----------------------------------------------------------------
@@ -94,6 +94,7 @@ export const CONFIG = {
       heading: 'Your results are ready.',
       subtext: 'Enter your name and email to see your scorecard and personalized growth plan.',
       blockedMessage: "We couldn't load the sign-up form. It may be blocked by your browser or an ad blocker.",
+      unconfirmedMessage: "We couldn't confirm your signup. You can submit the form again or view your score now.",
       blockedButton: 'Show my results',
     },
     results: {
@@ -115,10 +116,6 @@ export const CONFIG = {
       downloadHeading: 'Keep your scorecard',
       nameFieldLabel: 'Name to print on your scorecard',
       downloadButton: 'Download My Scorecard',
-      retake: 'Retake the Scorecard',
-      retakeConfirm: 'Start over? This clears your answers and results on this device.',
-      retakeYes: 'Yes, start over',
-      retakeNo: 'Cancel',
     },
     cookie: {
       text: 'This site uses cookies to improve your experience and measure our marketing.',

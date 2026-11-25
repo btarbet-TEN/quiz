@@ -30,12 +30,11 @@ statements. The last pillar's button says "See My Results". The progress bar fil
 Quiz state (answers, screen, step, gate unlock, `savedAt`) is saved in the visitor's browser in
 **`localStorage`** under `ten-scorecard-v1` (expires after ~180 days), so progress and results survive
 closed tabs and later visits on the same device. (An older `sessionStorage` copy under the same key is
-read once as a fallback and cleared on Retake.) `localStorage` also holds `ten-cookie-notice-dismissed`.
+read as a fallback and cleared when it expires.) `localStorage` also holds `ten-cookie-notice-dismissed`.
 Nothing else is stored, and nothing is stored on a server.
 Each screen gets a browser-history entry (`pushState`), so browser/phone Back moves one screen; revealing
 results *replaces* the gate entry, so Back from results returns to the last pillar. `allowedScreen()`
 guards every navigation (no gate/results with incomplete answers, no results without the unlock).
-Retake asks for confirmation, then clears everything (including the unlock, so the gate shows again).
 All storage calls are wrapped in try/catch.
 
 ## Pillars (framework order = tie-break order)
@@ -68,7 +67,7 @@ Statement wording and pillar descriptions are approved copy. Don't edit them wit
   screen, unlock flag; no name or email) and `ten-cookie-notice-dismissed`. See Flow.
 - Name + email are collected **only inside the embedded Flodesk form**; Flodesk stores them.
 - The optional "Name to print on your scorecard" field is used only inside the PDF, never stored or sent.
-  It is prefilled with the first name typed into the Flodesk form, read at submit time and kept in memory
+  It is prefilled only from a recognized Flodesk name field and kept in memory until leaving results
   only (not saved to storage, never sent to trackers).
 - **Never send names, emails or individual answers to any tracker.** What trackers do receive (once their
   IDs are set): page views, quiz-progress events (pillar name and step number), and the **growth pillar
@@ -88,8 +87,7 @@ Statement wording and pillar descriptions are approved copy. Don't edit them wit
 - Flodesk's universal script is **not** in index.html. The first time the gate renders, gate.js calls
   `loadFlodesk()` (`js/flodesk-loader.js`, Flodesk's embed snippet unchanged, runs once), then mounts
   the form: container `<div id="fd-form-{formId}">` + `window.fd('form', { formId, containerEl })`.
-  `window.fd` queues calls until Flodesk's script arrives, so later gate views (e.g. a Retake on a
-  different pillar) reuse the loaded script.
+  `window.fd` queues calls until Flodesk's script arrives. Later gate views reuse the loaded script.
 - One form per **growth pillar**; each adds the subscriber to that pillar's segment → pillar workflow.
 
 | Growth pillar | Form ID |
@@ -104,17 +102,11 @@ All five IDs are real. A missing or `PLACEHOLDER…` ID does **not** fall back t
 (that would tag people with the wrong pillar): `formIdFor()` returns null, logs `console.error`, and the
 gate shows its "Show my results" fallback straight away. Covered by `tests/gate.test.js`.
 
-Submission detection (`gate.js`):
-1. MutationObserver on the container: `[data-ff-stage="success"]` reveals results immediately. Looser
-   matches (`[data-ff-el="success"]`, visible `[class*="success"]`) count only after a submit.
-2. Capture-phase `submit` listener: if the form is valid and no success state appears within
-   `submitFallbackMs` (1.5s), reveal anyway unless a visible error (`data-ff-stage="error"`, `aria-invalid`) shows.
-3. If no form has rendered after `renderTimeoutMs` (6s), e.g. an ad blocker on assets.flodesk.com,
-   show a message + "Show my results". This path does **not** fire the Lead event. If the form renders
-   after that (slow network), the fallback panel is hidden again and its button is ignored.
-The Flodesk DOM selectors were verified against a simulated form only (assets.flodesk.com was blocked
-from the build sandbox). Verify against the live form; adjust `SUCCESS_SELECTORS` in gate.js if needed.
-Live QA (2026-10-06) confirmed each pillar's form is used and results appear after submit.
+Submission detection (`gate.js`): a visible Flodesk success stage or success element opens
+results and records a Lead when analytics is enabled. A visible submission error or eight seconds
+without confirmation offers a retry through the existing form or a button to see results.
+If the form never renders, a separate button appears after six seconds and hides if the form
+loads later. Both manual paths skip signup tracking.
 
 Flodesk-side settings (in the Flodesk form editor, not code): double opt-in OFF (otherwise subscribers
 sit "unconfirmed" with no segment and never enter a workflow), "show success message" not redirect,
@@ -130,7 +122,7 @@ fine print ≥ 13px); they use guessed Flodesk class patterns, so the editor set
 | Start clicked | custom `QuizStarted` | `quiz_start` |
 | Each pillar screen completed | custom `PillarCompleted` {pillar} | `pillar_complete` {pillar, step} |
 | Last question screen completed | custom `QuizCompleted` | `quiz_complete` |
-| Flodesk form submitted | standard `Lead` {content_name: growth pillar} | `generate_lead` {growth_pillar} |
+| Flodesk signup confirmed | standard `Lead` {content_name: growth pillar} | `generate_lead` {growth_pillar} |
 | Join EDGE clicked | custom `EdgeCTAClick` {growth_pillar} | `edge_cta_click` {growth_pillar} |
 | PDF downloaded | custom `ScorecardDownloaded` | `scorecard_download` |
 

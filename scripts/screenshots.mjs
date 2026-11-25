@@ -27,7 +27,7 @@ const { chromium } = loadPlaywright();
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css',
-  '.svg': 'image/svg+xml', '.png': 'image/png', '.ttf': 'font/ttf', '.json': 'application/json',
+  '.svg': 'image/svg+xml', '.png': 'image/png', '.ttf': 'font/ttf', '.woff2': 'font/woff2', '.json': 'application/json',
 };
 // Send the same headers Vercel would (vercel.json), so CSP report-only violations show up here too.
 const vercel = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'));
@@ -52,7 +52,7 @@ const widths = (process.env.WIDTHS || '360,390,768,1024,1280,1440').split(',').m
 const heights = { 360: 740, 375: 667, 390: 844, 768: 1024, 1024: 768, 1280: 800, 1440: 900 };
 // Respect an outbound HTTPS proxy (e.g. CI / cloud sandboxes) but keep the local server direct.
 const args = process.env.HTTPS_PROXY ? [`--proxy-server=${process.env.HTTPS_PROXY}`, '--proxy-bypass-list=127.0.0.1;localhost'] : [];
-const browser = await chromium.launch({ args });
+const browser = await chromium.launch({ args, executablePath: process.env.CHROMIUM_EXECUTABLE });
 const problems = [];
 const cspViolations = new Set();
 
@@ -67,6 +67,47 @@ async function shot(page, w, name) {
   await page.screenshot({ path: path.join(outDir, `${w}-${name}.png`), fullPage: true });
 }
 
+async function checkMobileControls(page, label) {
+  const row = page.locator('.statement').last().locator('.rating label');
+  try {
+    for (const rating of await row.all()) await rating.click({ trial: true, timeout: 2500 });
+    await page.locator('[data-action="back"]').click({ trial: true, timeout: 2500 });
+    const next = page.locator('[data-action="next"]');
+    // Next is intentionally aria-disabled until every statement is answered.
+    await next.scrollIntoViewIfNeeded();
+    const reachable = await next.evaluate((button) => {
+      const r = button.getBoundingClientRect();
+      return button.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+    });
+    if (!reachable) problems.push(`${label}: Next is covered`);
+  } catch (error) {
+    problems.push(`${label}: a rating or Back was unreachable (${error.message.split('\n')[0]})`);
+  }
+}
+
+const FLODESK = 'https://assets.flodesk.com/universal*';
+const formFixture = `
+  const queued = window.fd.q || [];
+  window.fd = (_, { containerEl }) => {
+    setTimeout(() => {
+      const host = document.querySelector(containerEl);
+      if (!host) return;
+      host.innerHTML = '<form><input name="postal" value="12345"><label>First name<span hidden>x</span><input type="text" name="fixture-name-field" value="Ada"></label><input type="email" value="audit@example.invalid" required><button>Submit</button></form>';
+      host.querySelector('form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (host.dataset.fail === 'true') {
+          host.querySelector('input[type=email]').setAttribute('aria-invalid', 'true');
+          return;
+        }
+        host.querySelector('input[type=email]').removeAttribute('aria-invalid');
+        if (host.dataset.silent === 'true') return;
+        setTimeout(() => { host.innerHTML = '<p data-ff-stage="success">Signed up</p>'; }, 2000);
+      });
+    }, 6500);
+  };
+  queued.forEach((args) => window.fd(...args));
+`;
+
 // Answer pattern -> scores 23, 17, 12, 17, 21: growth = Inclusion & Differentiation.
 const PATTERN = [[5, 5, 4, 4, 5], [4, 3, 4, 3, 3], [2, 3, 2, 3, 2], [3, 4, 3, 4, 3], [4, 5, 4, 4, 4]];
 
@@ -79,6 +120,9 @@ for (const w of widths) {
     acceptDownloads: true,
   });
   const page = await context.newPage();
+  await page.route(FLODESK, (route) => w === 390
+    ? route.fulfill({ contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: formFixture })
+    : route.fulfill({ contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: '// Simulate a form that never loads.' }));
   page.on('pageerror', (e) => problems.push(`${w}px page error: ${e.message}`));
   page.on('console', (m) => {
     const text = m.text();
@@ -109,6 +153,11 @@ for (const w of widths) {
       await page.evaluate(() => window.scrollTo(0, 0));
       await shot(page, w, '2a-next-feedback');
     }
+    if (step === 0 && (w === 360 || w === 390)) {
+      await checkMobileControls(page, `${w}px with cookie notice`);
+      await page.locator('#cookie-bar button').click();
+      await checkMobileControls(page, `${w}px after cookie notice`);
+    }
     for (let i = 0; i < 5; i += 1) {
       await page.locator(`.statement >> nth=${i}`).locator(`label >> nth=${PATTERN[step][i] - 1}`).click();
     }
@@ -132,9 +181,28 @@ for (const w of widths) {
   await shot(page, w, '4-gate');
   await page.waitForSelector('[data-gate-blocked]:not([hidden]), .fd-container form', { timeout: 15000 }).catch(() => {});
   await shot(page, w, '5-gate-after-wait');
-  const blockedVisible = await page.locator('[data-gate-blocked]:not([hidden])').count();
-  if (blockedVisible) await page.click('[data-action="skip-gate"]');
-  else problems.push(`${w}px: Flodesk form rendered; submit manually to test (skipped)`);
+  if (w === 390) {
+    await page.locator('.fd-container form').waitFor();
+    if (await page.locator('[data-gate-blocked]:visible').count()) problems.push('late form did not hide the load fallback');
+    await page.locator('.fd-container').evaluate((host) => { host.dataset.fail = 'true'; });
+    await page.locator('.fd-container button').click();
+    await page.locator('[data-gate-unconfirmed]').waitFor();
+    if (await page.locator('.screen--results').count()) problems.push('failed submission opened results');
+    await page.locator('.fd-container').evaluate((host) => {
+      host.dataset.fail = 'false';
+      host.dataset.silent = 'true';
+    });
+    await page.locator('.fd-container button').click();
+    await page.locator('[data-gate-unconfirmed]').waitFor({ timeout: 12000 });
+    if (await page.locator('.screen--results').count()) problems.push('unconfirmed submission opened results');
+    await page.locator('.fd-container').evaluate((host) => { host.dataset.silent = 'false'; });
+    await page.locator('.fd-container button').click();
+    if (await page.locator('[data-gate-unconfirmed]:visible').count()) problems.push('retry did not clear the error prompt');
+    await page.locator('.screen--results').waitFor();
+    if (await page.locator('#print-name').inputValue() !== 'Ada') problems.push('recognized name was not prefilled');
+  } else {
+    await page.locator('[data-action="skip-gate"]').click();
+  }
 
   await page.waitForSelector('.screen--results', { timeout: 5000 }).catch(() => problems.push(`${w}px: results not shown`));
   await page.evaluate(() => document.fonts.ready);
@@ -161,12 +229,9 @@ for (const w of widths) {
     if (!/fulfillment/i.test(back)) problems.push(`browser Back from results went to "${back}"`);
     await page.goForward();
     await page.waitForSelector('.screen--results');
+    if (await page.locator('#print-name').inputValue()) problems.push('name survived leaving results');
 
-    // Retake asks first.
-    await page.click('[data-action="retake"]');
-    if (!(await page.locator('[data-retake-confirm]:not([hidden])').count())) problems.push('retake has no confirmation');
-    await page.click('[data-action="retake-no"]');
-    if (!(await page.locator('.screen--results').count())) problems.push('retake cancel left results');
+    if (await page.locator('[data-action="retake"]').count()) problems.push('Retake still appears on results');
 
     // Non-Latin names in the PDF (rendered as an image, so they can't garble).
     await page.fill('#print-name', 'Łukasz 山田 太郎');
@@ -189,11 +254,33 @@ for (const [w, h] of [[844, 390], [1180, 820]]) {
   await page.click('[data-action="begin"]');
   await page.waitForSelector('.statement');
   await shot(page, `${w}x${h}`, 'landscape-question');
+  if (h === 390) {
+    await checkMobileControls(page, 'landscape with cookie notice');
+    await page.locator('#cookie-bar button').click();
+    await checkMobileControls(page, 'landscape after cookie notice');
+  }
   await context.close();
 }
+
+// Legacy progress is preserved, while malformed or expired snapshots cannot unlock results.
+const recovery = await browser.newPage();
+await recovery.goto(base);
+for (const [label, raw, screen] of [
+  ['broken JSON', '{', '.screen--intro'],
+  ['expired', JSON.stringify({ screen: 'results', unlocked: true, savedAt: 1 }), '.screen--intro'],
+  ['incomplete results', JSON.stringify({ screen: 'results', step: 4, unlocked: true, savedAt: Date.now() }), '.screen--question'],
+  ['invalid step', JSON.stringify({ screen: 'question', step: 2.5, savedAt: Date.now() }), '.screen--question'],
+]) {
+  await recovery.evaluate((value) => localStorage.setItem('ten-scorecard-v1', value), raw);
+  await recovery.reload();
+  if (!(await recovery.locator(screen).count())) problems.push(`${label}: failed to recover to ${screen}`);
+}
+await recovery.close();
 
 await browser.close();
 server.close();
 console.log(cspViolations.size ? `\nCSP report-only violations:\n- ${[...cspViolations].join('\n- ')}` : '\nNo CSP report-only violations.');
 console.log(problems.length ? `\nIssues:\n- ${problems.join('\n- ')}` : '\nNo issues found.');
 console.log(`Screenshots in ${outDir}`);
+
+if (problems.length || cspViolations.size) process.exitCode = 1;

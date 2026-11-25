@@ -29,7 +29,6 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
    - Growth plan card with 3 recommended trainings and any "also worth your attention" pillars
    - "The support you need" section with the **Join Elementary Music EDGE®** button
    - Optional name field and **Download My Scorecard** (PDF)
-   - **Retake the Scorecard**
 
 ### Scoring (unit-tested, 11 tests passing)
 - **Pillar score:** the sum of its 5 ratings, from 5 to 25.
@@ -48,7 +47,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 | Curriculum & Planning | `6ac3b81e147b36f92f884773` | QUIZ/CURRICULUM |
 | Teacher Fulfillment | `6ac3b8379c6b79a7586772e7` | QUIZ/FULFILLMENT |
 
-- **After submission:** results appear when Flodesk shows its success state. If it doesn't, they appear about 1.5 seconds after a valid submit.
+- **After submission:** results appear when Flodesk shows its success state. If Flodesk reports an error or takes more than eight seconds to confirm, the teacher can retry or choose to see results. Only confirmed signups count as leads.
 - **If the form is blocked** (for example by an ad blocker), a "Show my results" button appears after 6 seconds, so nobody gets stuck.
 - **If the form loads after that fallback appears,** the fallback hides again and its button stops working.
 - **A missing form ID** shows the fallback with a console error. It never uses another pillar's form.
@@ -70,7 +69,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 
   No name or email is stored.
 - **Name and email are collected only by Flodesk.**
-- **The PDF name field** is prefilled from the email form in memory only. It's never stored or sent.
+- **The PDF name field** is prefilled only from a recognized name field and cleared when leaving results. It's never stored or sent.
 - **Trackers** never receive names, emails, individual answers or scores. Meta and GA4 receive the **growth pillar name** on the Lead and EDGE-click events, plus quiz-progress events (pillar name and step).
 - **Meta pixel automatic configuration is off** in code. *Automatic Advanced Matching* must also be turned off in Meta Events Manager.
 - **Clarity masking** covers the whole quiz: every screen, the ratings, scores and results, plus the email gate and the PDF name field.
@@ -142,7 +141,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 - [ ] **GA4 Measurement ID** added
 - [ ] **Microsoft Clarity ID** added, with masking set to **Strict** in the Clarity dashboard
 - [ ] **Meta Events Manager:** Automatic Advanced Matching turned **off** for the pixel
-- [ ] **Switch the CSP from report-only to enforced** after checking the live console with tracker IDs set and the real Flodesk form loaded
+- [ ] **Switch the CSP from report-only to enforced** after checking a real Flodesk submission and PDF in preview. Retest the policy separately for each tracker before enabling it
 - [ ] **Real logo, OG image and favicon** added
 - [ ] **Real copy** for each pillar's foundation and growth text replaced in `public/js/config.js`
 - [ ] **15 real recommended trainings** (3 per pillar: title, clinician, one-line description)
@@ -179,7 +178,6 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 ## Open decisions and notes
 - **"Guarantee" wording.** The About page says "get out the door on time" instead of "guarantee you leave work on time," to avoid making a promise you could be held to. You can change it back.
 - **"About five minutes"** on the About page is an estimate.
-- **Retake clears everything,** including the email gate. People re-submit the form, so they land in the new segment if their growth pillar changes.
 - **EU consent.** Requiring an email before showing results isn't airtight under GDPR for EU visitors. An optional consent checkbox in Flodesk would reduce the risk.
 - **PDF body font** is Helvetica, and it could embed Inter to match the site. Headings already use Archivo Black.
 

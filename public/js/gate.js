@@ -1,23 +1,6 @@
-// Email gate: embeds the Flodesk form for the person's growth pillar and detects
-// a successful submission. Flodesk collects and stores the name/email; this code
-// never reads, stores or forwards them.
-//
-// Submission detection, in order of preference:
-//   1. Flodesk's success state appears inside the container (MutationObserver).
-//   2. A `submit` event bubbles from the form and no success state shows up:
-//      reveal after `submitFallbackMs` if the form's fields are valid.
-// Never trap the user: if the form hasn't rendered after `renderTimeoutMs`
-// (e.g. assets.flodesk.com blocked), show a "Show my results" button.
-// Flodesk's script itself is only loaded here, on the first gate view (flodesk-loader.js).
-
+// Flodesk collects signup details. Only its visible success state confirms a lead.
 import { CONFIG, isPlaceholder } from './config.js';
 import { loadFlodesk } from './flodesk-loader.js';
-
-const SUCCESS_SELECTORS = [
-  '[data-ff-stage="success"]',
-  '[data-ff-el="success"]',
-  '[class*="success"]',
-];
 
 /**
  * Form ID for a pillar's growth form, or null if it's missing or still a placeholder.
@@ -48,20 +31,20 @@ function queryAllDeep(root, selector) {
   return found;
 }
 
-// The data-ff-stage attribute is definitive. Looser "success" element/class matches
-// only count after a submit, so they can't fire on first render.
-function hasSuccessState(container, afterSubmit) {
-  const stage = queryAllDeep(container, '[data-ff-stage]').some((el) => el.getAttribute('data-ff-stage') === 'success');
-  if (stage || !afterSubmit) return stage;
-  return SUCCESS_SELECTORS.slice(1).some((sel) => queryAllDeep(container, sel).some(isVisible));
+function hasSuccessState(container) {
+  return queryAllDeep(container, '[data-ff-stage="success"], [data-ff-el="success"]').some(isVisible);
 }
 
-// The first-name value from the Flodesk form, used only to prefill the PDF name field (memory only).
+// Copy only a recognized name field. The value is used in memory for the PDF.
 function readFirstName(container) {
-  const byName = queryAllDeep(container, 'input[name*="first" i], input[autocomplete="given-name"], input[autocomplete="name"]')[0];
-  const fallback = queryAllDeep(container, 'input[type="text"]').find((el) => !/mail/i.test(el.name || ''));
-  const input = byName || fallback;
-  return input ? String(input.value || '').trim() : '';
+  const fields = queryAllDeep(container, 'input[type="text"]').filter(isVisible);
+  const matches = (field, token, pattern) =>
+    field.autocomplete.split(/\s+/).includes(token) ||
+    pattern.test(field.name) ||
+    [...field.labels].some((label) => pattern.test(label.innerText.trim()));
+  const firstName = fields.find((field) => matches(field, 'given-name', /^(first[-_ ]?name|name_first)$/i));
+  const name = firstName || fields.find((field) => matches(field, 'name', /^(name|full[-_ ]?name)$/i));
+  return name ? name.value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 80) : '';
 }
 
 function hasRenderedForm(container) {
@@ -72,10 +55,10 @@ function hasRenderedForm(container) {
  * Mount the gate form.
  * @param {HTMLElement} host element to render the form container into
  * @param {string} growthSlug
- * @param {{onSuccess: (how: string, info: {firstName: string}) => void, onBlocked: () => void, onRendered?: () => void}} handlers
+ * @param {{onSuccess: (info: {firstName: string}) => void, onBlocked: () => void, onRendered?: () => void, onPending?: () => void, onUnconfirmed?: () => void}} handlers
  * @returns {() => void} cleanup
  */
-export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRendered = () => {} }) {
+export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRendered = () => {}, onPending = () => {}, onUnconfirmed = () => {} }) {
   const formId = formIdFor(growthSlug);
   if (!formId) {
     host.innerHTML = '';
@@ -96,35 +79,42 @@ export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRender
   let firstName = '';
   const timers = [];
 
-  const finish = (how) => {
+  const finish = () => {
     if (done) return;
     done = true;
     cleanup();
     if (!firstName) firstName = readFirstName(container);
-    onSuccess(how, { firstName });
+    onSuccess({ firstName });
   };
 
-  const observer = new MutationObserver(() => {
+  const checkForm = () => {
     if (done) return;
     if (!rendered && hasRenderedForm(container)) { rendered = true; onRendered(); }
-    if (hasSuccessState(container, submitted)) finish('success-state');
-  });
-  observer.observe(container, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'data-ff-stage', 'hidden'] });
+    if (hasSuccessState(container)) { finish(); return; }
+    if (submitted && submitTimer !== null &&
+      queryAllDeep(container, '[data-ff-stage="error"], [aria-invalid="true"]').some(isVisible)) {
+      clearTimeout(submitTimer);
+      submitTimer = null;
+      onUnconfirmed();
+    }
+  };
+  const observer = new MutationObserver(checkForm);
+  observer.observe(container, { subtree: true, childList: true, attributes: true });
+  // Open shadow roots may update without notifying the container observer.
+  const poll = setInterval(checkForm, 250);
 
-  // `submit` bubbles from a light-DOM form. Only treat it as a submission if the
-  // browser considers the fields valid; then give Flodesk a moment to show success.
   const onSubmit = (event) => {
     const form = event.target;
     if (form && typeof form.checkValidity === 'function' && !form.checkValidity()) return;
     submitted = true;
+    onPending();
     // Read now: Flodesk may clear the fields once it shows its success state.
     firstName = readFirstName(container);
     clearTimeout(submitTimer);
     submitTimer = setTimeout(() => {
-      if (done) return;
-      const hasError = queryAllDeep(container, '[data-ff-stage="error"], [aria-invalid="true"]').some(isVisible);
-      if (!hasError) finish('submit-fallback');
-    }, CONFIG.flodesk.submitFallbackMs);
+      submitTimer = null;
+      if (!done) onUnconfirmed();
+    }, CONFIG.flodesk.confirmationTimeoutMs);
   };
   container.addEventListener('submit', onSubmit, true);
 
@@ -134,14 +124,16 @@ export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRender
   }, CONFIG.flodesk.renderTimeoutMs));
 
   function cleanup() {
+    done = true;
     observer.disconnect();
+    clearInterval(poll);
     container.removeEventListener('submit', onSubmit, true);
     clearTimeout(submitTimer);
     timers.forEach(clearTimeout);
   }
 
   try {
-    // First gate view loads Flodesk; later views (e.g. a Retake landing on another pillar)
+    // First gate view loads Flodesk; later views
     // reuse it. window.fd queues the call until Flodesk's script is ready.
     loadFlodesk();
     if (typeof window.fd !== 'function') throw new Error('Flodesk script not available');
