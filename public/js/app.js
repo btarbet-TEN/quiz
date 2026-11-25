@@ -320,23 +320,23 @@ function resultsHtml() {
 
   const trainings = growth.trainings.map((training, index) => {
     const id = `training-details-${index}`;
-    const speakers = training.speakers.map((speakerId) => {
-      const speaker = SPEAKERS[speakerId];
-      return `<span class="training__speaker">
-        <img src="${esc(speaker.headshot)}" alt="" width="48" height="48" loading="lazy" decoding="async">
-        <span>${esc(speaker.name)}</span>
-      </span>`;
-    }).join('');
+    const speakers = training.speakers.map((speakerId) => SPEAKERS[speakerId]);
+    const portraits = speakers.map((speaker) =>
+      `<img src="${esc(speaker.headshot)}" alt="" width="48" height="48" loading="lazy" decoding="async">`).join('');
+    const speakerCredit = `<span class="training__speaker${speakers.length > 1 ? ' training__speaker--group' : ''}">
+      <span class="training__portraits">${portraits}</span>
+      <span>${esc(speakers.map((speaker) => speaker.name).join(' & '))}</span>
+    </span>`;
     return `
     <li class="training">
       <button class="training__button" type="button" aria-haspopup="dialog" aria-controls="${id}">
         <span class="training__title">${esc(training.title)}</span>
-        <span class="training__speakers">${speakers}</span>
+        <span class="training__speakers">${speakerCredit}</span>
         <span class="training__details-link">View session details <span aria-hidden="true">→</span></span>
       </button>
       <dialog class="training-dialog" id="${id}" aria-labelledby="${id}-title">
         <h2 id="${id}-title">${esc(training.title)}</h2>
-        <div class="training__speakers">${speakers}</div>
+        <div class="training__speakers">${speakerCredit}</div>
         <p class="training-dialog__description">${esc(training.description)}</p>
         <form method="dialog">
           <button type="submit" class="btn btn--ghost">Close</button>
