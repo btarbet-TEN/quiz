@@ -11,7 +11,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 | **Vercel project** | `ten-pillar-quiz` (team: bryson-2285's projects) |
 | **GitHub repo** | `bryson-debug/quiz`, branch `claude/music-success-scorecard-8qdf92` (Vercel's production branch) |
 | **Deploys** | Automatic: every push to that branch goes live in a few seconds |
-| **Overall** | Built, deployed and on the real domain. Live testing is next. Copy, trainings, logo and tracking IDs are still placeholders. |
+| **Overall** | Built, deployed and on the real domain. Live testing is next. Copy, trainings, social image and tracking IDs are still placeholders. |
 
 ---
 
@@ -142,7 +142,8 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 - [ ] **Microsoft Clarity ID** added, with masking set to **Strict** in the Clarity dashboard
 - [ ] **Meta Events Manager:** Automatic Advanced Matching turned **off** for the pixel
 - [x] **Enforce the CSP in the audit build** after checking a real Flodesk submission and PDF at the preview origin. Retest before enabling each tracker.
-- [ ] **Real logo, OG image and favicon** added
+- [x] **Real logo and light/dark favicons** added
+- [ ] **Real OG image and Apple touch icon** added
 - [ ] **Real copy** for each pillar's foundation and growth text replaced in `public/js/config.js`
 - [ ] **15 real recommended trainings** (3 per pillar: title, clinician, one-line description)
 - [ ] **Privacy policy updated** to name Flodesk, Meta Pixel, Google Analytics and Microsoft Clarity (session recording and heatmaps)
@@ -159,9 +160,8 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 | Meta Pixel, GA4 and Clarity IDs | `tracking` (trackers stay off until set) |
 | Foundation and growth copy for all 5 pillars | `pillars[].foundationCopy` / `growthCopy` |
 | 3 recommended trainings per pillar (15 total) | `pillars[].trainings` |
-| TEN logo | `public/assets/ten-logo-black.svg` |
 | OG share image (1200×630) | `public/assets/og-image.png` |
-| Favicons | `public/assets/favicon.svg`, `favicon.png`, `apple-touch-icon.png` |
+| Apple touch icon | `public/assets/apple-touch-icon.png` |
 
 ---
 
@@ -170,7 +170,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 2. **Live test:** run the Claude for Chrome test brief, then have Claude check that each test subscriber landed in the right QUIZ segment.
 3. **Step 4:** Build the 5 pillar workflows in Flodesk.
 4. **Steps 5–7:** Create Meta Pixel, GA4 and Clarity, and send the IDs to add.
-5. **Content:** send the real pillar copy, the 15 trainings, and the logo, OG image and favicon files.
+5. **Content:** send the real pillar copy, the 15 trainings, and the OG image and Apple touch icon.
 6. **Final launch checks:** privacy policy update, ad-blocker test, and real-device testing.
 
 ---

@@ -150,7 +150,7 @@ notice, not a consent gate (dismissal stored in `localStorage` key `ten-cookie-n
   `font-weight: 400` (no faux bold). Body: Inter, **self-hosted** woff2 in `public/fonts/` (weights
   400–700, Latin + Latin Extended, SIL OFL; Google Fonts was removed). The PDF embeds Archivo Black.
 - Calm and spacious, mint blocks and soft circles as decoration (`.decor`, tablet and up). No bright accents.
-- Placeholders: `public/assets/ten-logo-black.svg`, `og-image.png`, `favicon.svg/png`, `apple-touch-icon.png`.
+- Placeholders: `public/assets/og-image.png` and `public/assets/apple-touch-icon.png`. The site uses the official TEN logo and pairs `favicon.png` with `favicon-dark.png` for browser color schemes.
 
 ## Responsive and accessibility rules
 

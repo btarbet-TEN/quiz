@@ -50,15 +50,15 @@ Everything is in `public/js/config.js`:
 - `copy.*`: screen text, footer, cookie bar, PDF text
 - `links`: EDGE URL + UTM parameters, legal links
 
-Replace `public/assets/ten-logo-black.png`, `og-image.png` (1200×630), `favicon.svg`, `favicon.png`
-(32×32) and `apple-touch-icon.png` (180×180), keeping the same filenames.
+The main TEN logo is `public/assets/ten-logo-black.png`. The browser tab uses `favicon.png` in light mode and `favicon-dark.png` in dark mode (both 32×32). Replace `og-image.png` (1200×630) and `apple-touch-icon.png` (180×180) when approved assets are available.
 
 ## Launch checklist
 
 - [x] Replace the 4 placeholder Flodesk form IDs
 - [ ] Each Flodesk form adds subscribers to the correct pillar segment, with consent wording set in Flodesk's form settings
 - [ ] 5 Flodesk segments and 5 pillar workflows are built
-- [ ] Real TEN black logo, OG image and favicon added
+- [x] Real TEN logo and light/dark favicons added
+- [ ] Real OG image and Apple touch icon added
 - [ ] Placeholder pillar copy and recommended trainings replaced in config
 - [ ] Meta Pixel, GA4 and Clarity IDs added; Clarity masking set to Strict
 - [ ] Meta Events Manager: Automatic Advanced Matching turned off for the pixel
