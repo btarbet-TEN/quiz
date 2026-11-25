@@ -2,7 +2,7 @@
 // Answers live in memory, mirrored to localStorage on this device (no personal data),
 // and each screen gets a browser-history entry so Back/forward move through the quiz.
 
-import { CONFIG } from './config.js';
+import { CONFIG, SPEAKERS } from './config.js';
 import { computeResults, isPillarComplete, STATEMENTS_PER_PILLAR } from './scoring.js';
 import { radarSvg } from './radar.js';
 import { initTracking, track } from './tracking.js';
@@ -307,11 +307,18 @@ function resultsHtml() {
       </li>`;
   }).join('');
 
-  const trainings = growth.trainings.map((t) => `
+  const trainings = growth.trainings.map((training) => `
     <li class="training">
-      <p class="training__title">${esc(t.title)}</p>
-      <p class="training__clinician">${esc(t.clinician)}</p>
-      <p class="training__desc">${esc(t.description)}</p>
+      <p class="training__title">${esc(training.title)}</p>
+      <ul class="training__speakers">
+        ${training.speakers.map((id) => {
+          const speaker = SPEAKERS[id];
+          return `<li class="training__speaker">
+            <img src="${esc(speaker.headshot)}" alt="" width="48" height="48" loading="lazy" decoding="async">
+            <span>${esc(speaker.name)}</span>
+          </li>`;
+        }).join('')}
+      </ul>
     </li>`).join('');
 
   const also = r.alsoAttention.length

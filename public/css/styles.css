@@ -582,9 +582,10 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
   display: grid; place-items: center;
   font: 700 0.9rem var(--font-body);
 }
-.training__title { font-weight: 700; margin: 0 0 2px; }
-.training__clinician { color: var(--grey); font-size: 0.92rem; margin: 0 0 6px; }
-.training__desc { margin: 0; }
+.training__title { font-weight: 700; margin: 0 0 12px; overflow-wrap: anywhere; }
+.training__speakers { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.training__speaker { display: flex; align-items: center; gap: 8px; color: var(--grey); font-size: 0.92rem; }
+.training__speaker img { flex: 0 0 48px; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; object-position: center 40%; background: var(--mint); }
 @media (min-width: 900px) {
   .trainings { grid-template-columns: repeat(3, 1fr); }
   .training { padding: 58px 18px 18px; }

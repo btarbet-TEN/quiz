@@ -1,7 +1,7 @@
 // In-browser PDF scorecard (jsPDF, vendored and lazy-loaded). Nothing is uploaded.
 // Same US Letter layout whatever device generates it.
 
-import { CONFIG } from './config.js';
+import { CONFIG, SPEAKERS } from './config.js';
 import { radarPoint, labelPlacement, tickPoint, GRID_STEPS, MAX_SCORE } from './radar.js';
 
 const PAGE = { w: 612, h: 792, margin: 48 }; // US Letter in points
@@ -281,11 +281,11 @@ export async function downloadScorecardPdf(results, printName) {
   y += 20;
 
   growth.trainings.forEach((t, i) => {
-    setBody(10);
-    const descLines = doc.splitTextToSize(t.description, contentW - 34);
     setBody(11, 'bold');
     const titleLines2 = doc.splitTextToSize(t.title, contentW - 34);
-    const blockH = titleLines2.length * 14 + 13 + descLines.length * 13 + 12;
+    setBody(9.5, 'normal', GREY);
+    const speakerLines = doc.splitTextToSize(t.speakers.map((id) => SPEAKERS[id].name).join(' and '), contentW - 34);
+    const blockH = titleLines2.length * 14 + speakerLines.length * 13 + 12;
     y = ensure(y, blockH);
     doc.setFillColor(...MINT);
     doc.circle(PAGE.margin + 10, y - 4, 10, 'F');
@@ -293,13 +293,10 @@ export async function downloadScorecardPdf(results, printName) {
     doc.text(String(i + 1), PAGE.margin + 10, y - 0.5, { align: 'center' });
     setBody(11, 'bold');
     doc.text(titleLines2, PAGE.margin + 30, y);
-    let ty = y + titleLines2.length * 14 - 1;
+    const ty = y + titleLines2.length * 14 - 1;
     setBody(9.5, 'normal', GREY);
-    doc.text(t.clinician, PAGE.margin + 30, ty);
-    ty += 13;
-    setBody(10);
-    doc.text(descLines, PAGE.margin + 30, ty);
-    y = ty + descLines.length * 13 + 8;
+    doc.text(speakerLines, PAGE.margin + 30, ty);
+    y = ty + speakerLines.length * 13 + 8;
   });
 
   // Footer on every page.

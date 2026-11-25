@@ -153,9 +153,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: Your classroom runs on clear expectations and dependable routines. Lean into this strength by using your procedures to free up more time for music-making, and share what works with colleagues.',
       growthCopy: 'PLACEHOLDER: Clear expectations and consistent procedures create the calm, focused room every music lesson needs. Small changes to routines and transitions can quickly give you back teaching time.',
       trainings: [
-        { title: 'PLACEHOLDER Training Title 1', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 2', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 3', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
+        { title: "Maximizing Instructional Time Through Engaging Transitions", speakers: ["bryson-tarbet"] },
+        { title: "Google Organization Tips for Busy Music Teachers", speakers: ["theresa-hoover"] },
+        { title: "Sub Smarter, Not Harder", speakers: ["rainy-montague"] },
       ],
     },
     {
@@ -174,9 +174,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: You bring a rich toolbox of approaches to your teaching. Lean into this strength by building lessons around the approaches your students respond to most.',
       growthCopy: 'PLACEHOLDER: Growing your toolbox of approaches like Kodály, Orff and Dalcroze helps every student find a way into the music.',
       trainings: [
-        { title: 'PLACEHOLDER Training Title 1', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 2', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 3', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
+        { title: "Different Ways to Use Boomwhackers", speakers: ["tyler-swick"] },
+        { title: "Instant Improvisation with Rhythmic Building Blocks", speakers: ["david-row"] },
+        { title: "Strategies for Keeping Upper Elementary Students Excited About Choir", speakers: ["bryson-tarbet"] },
       ],
     },
     {
@@ -195,9 +195,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: Your classroom is a place where every student belongs. Lean into this strength by making your adaptations part of how you plan every unit.',
       growthCopy: 'PLACEHOLDER: Practical strategies for differentiation and inclusion help every student take part fully, without adding hours to your planning.',
       trainings: [
-        { title: 'PLACEHOLDER Training Title 1', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 2', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 3', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
+        { title: "Harmony in the Hyphen: Embracing Filipino-American Heritage Through Music, Dance, & Identity", speakers: ["melissa-fuller-flores"] },
+        { title: "Guided Accessibility Audit", speakers: ["bryson-tarbet"] },
+        { title: "Culturally Responsive Music Ed in Action", speakers: ["ashley-cuthbertson"] },
       ],
     },
     {
@@ -216,9 +216,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: You plan with purpose and know where your students are headed. Lean into this strength by using your long-range plan to make room for creativity and student choice.',
       growthCopy: 'PLACEHOLDER: A clear long-range plan, well-paced lessons and simple assessments make every class period count and take the guesswork out of your week.',
       trainings: [
-        { title: 'PLACEHOLDER Training Title 1', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 2', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 3', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
+        { title: "Elementary Music Centers 101", speakers: ["becca-davis"] },
+        { title: "Work Smarter, Not Harder: Double Duty Songs", speakers: ["tanya-lejeune", "carrie-nicholas"] },
+        { title: "Low-Stress Concert Planning", speakers: ["bryson-tarbet"] },
       ],
     },
     {
@@ -237,12 +237,27 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: You find joy and purpose in your work. Lean into this strength by protecting the habits that keep you balanced, and let that energy carry into your classroom.',
       growthCopy: 'PLACEHOLDER: You can only pour from a full cup. Support, balance and self-advocacy help you keep loving this work for the long haul.',
       trainings: [
-        { title: 'PLACEHOLDER Training Title 1', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 2', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
-        { title: 'PLACEHOLDER Training Title 3', clinician: 'PLACEHOLDER Clinician', description: 'PLACEHOLDER one-line description of this training.' },
+        { title: "Bye-Bye Teaching Frenzy", speakers: ["grace-stevens"] },
+        { title: "The Performance Season Pressure Release", speakers: ["bryson-tarbet"] },
+        { title: "Teacher’s Pet: Loving Your Voice While Teaching Your Students", speakers: ["jennifer-whitehead"] },
       ],
     },
   ],
 };
 
 export const isPlaceholder = (value) => !value || String(value).startsWith('PLACEHOLDER');
+
+export const SPEAKERS = {
+  "bryson-tarbet": { name: "Bryson Tarbet, M.M.Ed.", headshot: "/assets/speakers/bryson-tarbet.webp" },
+  "theresa-hoover": { name: "Theresa Hoover", headshot: "/assets/speakers/theresa-hoover.webp" },
+  "rainy-montague": { name: "Rainy Montague", headshot: "/assets/speakers/rainy-montague.webp" },
+  "tyler-swick": { name: "Tyler Swick", headshot: "/assets/speakers/tyler-swick.webp" },
+  "david-row": { name: "David Row", headshot: "/assets/speakers/david-row.webp" },
+  "melissa-fuller-flores": { name: "Melissa Fuller Flores", headshot: "/assets/speakers/melissa-fuller-flores.webp" },
+  "ashley-cuthbertson": { name: "Ashley Cuthbertson", headshot: "/assets/speakers/ashley-cuthbertson.webp" },
+  "becca-davis": { name: "Becca Davis", headshot: "/assets/speakers/becca-davis.webp" },
+  "tanya-lejeune": { name: "Tanya LeJeune", headshot: "/assets/speakers/tanya-lejeune.webp" },
+  "carrie-nicholas": { name: "Carrie Nicholas", headshot: "/assets/speakers/carrie-nicholas.webp" },
+  "grace-stevens": { name: "Grace Stevens", headshot: "/assets/speakers/grace-stevens.webp" },
+  "jennifer-whitehead": { name: "Dr. Jennifer Whitehead", headshot: "/assets/speakers/jennifer-whitehead.webp" },
+};

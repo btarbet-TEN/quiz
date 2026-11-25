@@ -47,6 +47,7 @@ Everything is in `public/js/config.js`:
 - `flodesk.forms`: one Flodesk form ID per growth pillar
 - `tracking`: `META_PIXEL_ID`, `GA4_MEASUREMENT_ID`, `CLARITY_PROJECT_ID`. Leave the `PLACEHOLDER…` value to keep a tracker off.
 - `pillars[].foundationCopy`, `growthCopy`, `trainings`: results and PDF copy
+- `SPEAKERS`: names and round headshot assets used on the results screen
 - `copy.*`: screen text, footer, cookie bar, PDF text
 - `links`: EDGE URL + UTM parameters, legal links
 
@@ -59,7 +60,8 @@ The main TEN logo is `public/assets/ten-logo-black.png`. The browser tab uses `f
 - [ ] 5 Flodesk segments and 5 pillar workflows are built
 - [x] Real TEN logo and light/dark favicons added
 - [ ] Real OG image and Apple touch icon added
-- [ ] Placeholder pillar copy and recommended trainings replaced in config
+- [ ] Placeholder pillar copy replaced in config
+- [x] Recommended trainings and speaker headshots added
 - [ ] Meta Pixel, GA4 and Clarity IDs added; Clarity masking set to Strict
 - [ ] Meta Events Manager: Automatic Advanced Matching turned off for the pixel
 - [x] Content-Security-Policy enforced in the audit build. Retest the policy before enabling a tracker.
