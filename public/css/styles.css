@@ -204,6 +204,24 @@ a { color: var(--ink); text-underline-offset: 0.18em; }
 @media (min-width: 768px) { .logo img { height: 34px; } }
 body[data-screen="intro"] .site-header .logo { display: none; } /* intro shows the larger logo */
 
+.review-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 16px;
+  padding: 10px var(--gutter);
+  background: var(--mint);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.9rem;
+}
+.review-toolbar label { font-weight: 700; }
+.review-toolbar select { max-width: 100%; font: inherit; padding: 6px; }
+.review-toolbar a { color: inherit; }
+
 /* --- Main / screens ------------------------------------------------------ */
 main {
   position: relative;

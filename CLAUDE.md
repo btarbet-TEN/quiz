@@ -6,7 +6,7 @@ statements (5 pillars × 5), see a radar chart, and learn their **Growth Pillar*
 
 ## Stack and layout
 
-- Static site, **no build step**: plain HTML/CSS/vanilla JS (ES modules). Deployed by Vercel from `public/`.
+- Static HTML/CSS/vanilla JS site deployed by Vercel from `public/`. A preview-only build step generates `/review` for team members. Review Mode uses sample data and skips storage, tracking and Flodesk.
 - `public/js/config.js` holds **all editable content and IDs** (copy, pillar text, trainings, Flodesk
   form IDs, tracking IDs, URLs). Content changes go there, never in logic files.
 - `public/js/scoring.js`: pure scoring (unit-tested in `tests/scoring.test.js`, run `npm test`).

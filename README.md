@@ -5,7 +5,7 @@ Music Success quiz). Teachers rate 25 statements, see a radar chart of their fiv
 learn their **Growth Pillar** and **Foundation Pillar**. The results page recommends EDGE trainings and
 offers a PDF download.
 
-- Static site (HTML/CSS/vanilla JS). No framework, build step or backend.
+- Static site (HTML/CSS/vanilla JS). No framework or backend. Vercel generates the Review Mode page only for preview deployments.
 - No personal data is stored on our side. Name and email are collected only by the embedded Flodesk form.
 - **All content and IDs live in [`public/js/config.js`](public/js/config.js).** See [`CLAUDE.md`](CLAUDE.md) for every rule and decision.
 
@@ -23,7 +23,7 @@ a global install).
 
 ## Deploy (Vercel)
 
-1. Import this GitHub repo in Vercel. Framework preset: **Other**. No build command. `vercel.json`
+1. Import this GitHub repo in Vercel. Framework preset: **Other**. `vercel.json`
    sets the output directory to `public`.
 2. Pushing to `main` deploys production. Other branches get preview URLs.
 3. Add the domain **`audit.thatmusicteacher.com`** in Vercel → Project → Settings → Domains.

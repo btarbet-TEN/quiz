@@ -2,3 +2,4 @@ node_modules/
 screenshots/
 .vercel/
 .DS_Store
+/public/review.html

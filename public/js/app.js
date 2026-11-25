@@ -20,6 +20,8 @@ const COMPACT_CHART_MQ = window.matchMedia('(max-width: 599px)');
 
 const $main = document.getElementById('main');
 const $status = document.getElementById('sr-status');
+const reviewMode = document.body.hasAttribute('data-review-mode');
+let reviewScreenSelect;
 
 // ---------------------------------------------------------------------------
 // State
@@ -64,6 +66,7 @@ function loadState() {
 }
 
 function saveState() {
+  if (reviewMode) return;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, savedAt: Date.now() }));
   } catch (e) { /* storage blocked: progress just won't survive a reload */ }
@@ -275,6 +278,13 @@ function gateHtml() {
     <section class="screen screen--gate" aria-labelledby="screen-heading" data-clarity-mask="true">
       <h1 id="screen-heading" class="pillar-title" tabindex="-1">${esc(c.heading)}</h1>
       <p class="lead">${esc(c.subtext)}</p>
+      ${reviewMode ? `
+        <div class="gate__panel">
+          <p>Signup preview. This form is disabled in Review Mode.</p>
+          <div class="field"><label for="review-name">First name</label><input id="review-name" type="text" disabled></div>
+          <div class="field"><label for="review-email">Email address</label><input id="review-email" type="email" disabled></div>
+          <button type="button" class="btn" data-action="review-results">View Sample Results</button>
+        </div>` : `
       <div class="gate__panel">
         <p class="gate__loading" data-gate-loading>Loading the form…</p>
         <div class="gate__form" data-gate-form></div>
@@ -287,6 +297,7 @@ function gateHtml() {
           <button type="button" class="btn" data-action="show-unconfirmed-results">${esc(c.blockedButton)}</button>
         </div>
       </div>
+      `}
       <button type="button" class="link-btn" data-action="back">Back to the questions</button>
     </section>`;
 }
@@ -414,22 +425,24 @@ COMPACT_CHART_MQ.addEventListener?.('change', renderChart);
  */
 function go(screen, step = state.step, { focus = true, history = 'push' } = {}) {
   if (gateCleanup) { gateCleanup(); gateCleanup = null; }
-  ({ screen, step } = allowedScreen(screen, step));
+  if (!reviewMode) ({ screen, step } = allowedScreen(screen, step));
   if (state.screen === 'results' && screen !== 'results') gateFirstName = '';
   state.screen = screen;
   state.step = step;
-  saveState();
-  const entry = { quiz: { screen, step } };
-  try {
-    if (history === 'push') window.history.pushState(entry, '');
-    else if (history === 'replace') window.history.replaceState(entry, '');
-  } catch (e) { /* history unavailable (e.g. sandboxed iframe) */ }
+  if (!reviewMode) {
+    saveState();
+    const entry = { quiz: { screen, step } };
+    try {
+      if (history === 'push') window.history.pushState(entry, '');
+      else if (history === 'replace') window.history.replaceState(entry, '');
+    } catch (e) { /* history unavailable (e.g. sandboxed iframe) */ }
+  }
   render({ focus });
 }
 
 window.addEventListener('popstate', (e) => {
   const target = e.state && e.state.quiz;
-  if (!target) return;
+  if (reviewMode || !target) return;
   go(target.screen, target.step, { history: 'none' });
 });
 
@@ -449,13 +462,23 @@ function render({ focus = true } = {}) {
 
   if (state.screen === 'about') bindAbout();
   if (state.screen === 'question') bindQuestion();
-  if (state.screen === 'gate') bindGate();
+  if (state.screen === 'gate') {
+    if (reviewMode) {
+      $main.querySelector('[data-action="back"]').addEventListener('click', () => go('question', PILLARS.length - 1));
+      $main.querySelector('[data-action="review-results"]').addEventListener('click', () => showReviewScreen('results', 0));
+    } else bindGate();
+  }
   if (state.screen === 'results') bindResults();
 
   if (focus) {
     window.scrollTo(0, 0);
     const heading = $main.querySelector('#screen-heading');
     if (heading) heading.focus({ preventScroll: true });
+  }
+
+  if (reviewScreenSelect) {
+    const step = state.screen === 'results' ? ORDER.indexOf(results().growth) : state.step;
+    reviewScreenSelect.value = ['question', 'results'].includes(state.screen) ? `${state.screen}:${step}` : state.screen;
   }
 
   const announcements = {
@@ -629,13 +652,48 @@ $main.addEventListener('click', (e) => {
   go('about', 0);
 });
 
+function showReviewScreen(screen, step = 0) {
+  state.unlocked = screen === 'results';
+  state.answers = screen === 'results'
+    ? Object.fromEntries(ORDER.map((slug, index) => [slug, Array(STATEMENTS_PER_PILLAR).fill(index === step ? 2 : index === (step + 1) % ORDER.length ? 5 : 4)]))
+    : emptyAnswers();
+  go(screen, screen === 'question' ? step : PILLARS.length - 1);
+}
+
+function setupReviewMode() {
+  const options = (screen) => PILLARS.map((pillar, index) =>
+    `<option value="${screen}:${index}">${esc(pillar.name)}</option>`).join('');
+  const toolbar = document.createElement('nav');
+  toolbar.className = 'review-toolbar';
+  toolbar.setAttribute('aria-label', 'Quiz review');
+  toolbar.innerHTML = `
+    <label for="review-screen">Review Mode</label>
+    <select id="review-screen">
+      <option value="intro">Intro</option>
+      <option value="about">Pillars Overview</option>
+      <optgroup label="Question Pages">${options('question')}</optgroup>
+      <option value="gate">Signup Preview</option>
+      <optgroup label="Sample Results by Growth Pillar">${options('results')}</optgroup>
+    </select>
+    <a href="/">Open regular quiz</a>`;
+  $main.before(toolbar);
+  reviewScreenSelect = toolbar.querySelector('select');
+  reviewScreenSelect.addEventListener('change', () => {
+    const [screen, step = '0'] = reviewScreenSelect.value.split(':');
+    showReviewScreen(screen, Number(step));
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
-initTracking();
-loadState();
 renderFooter();
-setupCookieBar();
-({ screen: state.screen, step: state.step } = allowedScreen(state.screen, state.step));
-try { window.history.replaceState({ quiz: { screen: state.screen, step: state.step } }, ''); } catch (e) { /* ignore */ }
+if (reviewMode) setupReviewMode();
+else {
+  initTracking();
+  loadState();
+  setupCookieBar();
+  ({ screen: state.screen, step: state.step } = allowedScreen(state.screen, state.step));
+  try { window.history.replaceState({ quiz: { screen: state.screen, step: state.step } }, ''); } catch (e) { /* ignore */ }
+}
 render({ focus: false });
