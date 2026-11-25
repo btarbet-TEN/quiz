@@ -36,15 +36,14 @@ function hasSuccessState(container) {
 }
 
 // Copy only a recognized name field. The value is used in memory for the PDF.
-function readFirstName(container) {
+function findNameField(container) {
   const fields = queryAllDeep(container, 'input[type="text"]').filter(isVisible);
   const matches = (field, token, pattern) =>
     field.autocomplete.split(/\s+/).includes(token) ||
     pattern.test(field.name) ||
     [...field.labels].some((label) => pattern.test(label.innerText.trim()));
   const firstName = fields.find((field) => matches(field, 'given-name', /^(first[-_ ]?name|name_first)$/i));
-  const name = firstName || fields.find((field) => matches(field, 'name', /^(name|full[-_ ]?name)$/i));
-  return name ? name.value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 80) : '';
+  return firstName || fields.find((field) => matches(field, 'name', /^(name|full[-_ ]?name)$/i));
 }
 
 function hasRenderedForm(container) {
@@ -77,13 +76,17 @@ export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRender
   let submitted = false;
   let submitTimer = null;
   let firstName = '';
+  let nameField;
+  const captureName = () => {
+    if (!nameField?.isConnected) nameField = findNameField(container);
+    if (nameField) firstName = nameField.value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 80);
+  };
   const timers = [];
 
   const finish = () => {
     if (done) return;
     done = true;
     cleanup();
-    if (!firstName) firstName = readFirstName(container);
     onSuccess({ firstName });
   };
 
@@ -103,20 +106,34 @@ export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRender
   // Open shadow roots may update without notifying the container observer.
   const poll = setInterval(checkForm, 250);
 
-  const onSubmit = (event) => {
-    const form = event.target;
-    if (form && typeof form.checkValidity === 'function' && !form.checkValidity()) return;
+  const beginSubmission = (form) => {
+    if (!form || (!container.contains(form) && !queryAllDeep(container, 'form').includes(form))) return;
+    if (!form.checkValidity()) return;
     submitted = true;
     onPending();
     // Read now: Flodesk may clear the fields once it shows its success state.
-    firstName = readFirstName(container);
+    captureName();
     clearTimeout(submitTimer);
     submitTimer = setTimeout(() => {
       submitTimer = null;
       if (!done) onUnconfirmed();
     }, CONFIG.flodesk.confirmationTimeoutMs);
   };
+  // The hosted form can handle a submit-button click without emitting a native submit.
+  const onSubmit = (event) => beginSubmission(event.target);
+  const onClick = (event) => {
+    const button = event.composedPath().find((node) => node.matches?.('button[type="submit"], input[type="submit"]'));
+    if (button) beginSubmission(button.form);
+  };
+  const onKeyDown = (event) => {
+    if (event.key !== 'Enter' || event.isComposing) return;
+    const field = event.composedPath().find((node) => node.matches?.('input'));
+    if (field) beginSubmission(field.form);
+  };
+  container.addEventListener('input', captureName, true);
   container.addEventListener('submit', onSubmit, true);
+  container.addEventListener('click', onClick, true);
+  container.addEventListener('keydown', onKeyDown, true);
 
   // Render timeout: if nothing rendered, offer a way through.
   timers.push(setTimeout(() => {
@@ -127,7 +144,10 @@ export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRender
     done = true;
     observer.disconnect();
     clearInterval(poll);
+    container.removeEventListener('input', captureName, true);
     container.removeEventListener('submit', onSubmit, true);
+    container.removeEventListener('click', onClick, true);
+    container.removeEventListener('keydown', onKeyDown, true);
     clearTimeout(submitTimer);
     timers.forEach(clearTimeout);
   }

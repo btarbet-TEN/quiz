@@ -92,8 +92,8 @@ const formFixture = `
     setTimeout(() => {
       const host = document.querySelector(containerEl);
       if (!host) return;
-      host.innerHTML = '<form><input name="postal" value="12345"><label>First name<span hidden>x</span><input type="text" name="fixture-name-field" value="Ada"></label><input type="email" value="audit@example.invalid" required><button>Submit</button></form>';
-      host.querySelector('form').addEventListener('submit', (e) => {
+      host.innerHTML = '<form><input name="postal" value="12345"><label>First name<span hidden>x</span><input type="text" name="fixture-name-field" value="Ada"></label><input type="email" value="audit@example.invalid" required><button type="submit">Submit</button></form>';
+      host.querySelector('button').addEventListener('click', (e) => {
         e.preventDefault();
         if (host.dataset.fail === 'true') {
           host.querySelector('input[type=email]').setAttribute('aria-invalid', 'true');
