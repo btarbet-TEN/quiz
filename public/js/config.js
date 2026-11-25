@@ -153,9 +153,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: Your classroom runs on clear expectations and dependable routines. Lean into this strength by using your procedures to free up more time for music-making, and share what works with colleagues.',
       growthCopy: 'PLACEHOLDER: Clear expectations and consistent procedures create the calm, focused room every music lesson needs. Small changes to routines and transitions can quickly give you back teaching time.',
       trainings: [
-        { title: "Maximizing Instructional Time Through Engaging Transitions", speakers: ["bryson-tarbet"] },
-        { title: "Google Organization Tips for Busy Music Teachers", speakers: ["theresa-hoover"] },
-        { title: "Sub Smarter, Not Harder", speakers: ["rainy-montague"] },
+        { title: "Maximizing Instructional Time Through Engaging Transitions", speakers: ["bryson-tarbet"], description: "Stop losing precious instructional minutes to chaotic instrument passes and unfocused line-ups. Learn how to turn dead time into musical, engaging transitions that keep students on task and give you back hours of teaching time every semester." },
+        { title: "Google Organization Tips for Busy Music Teachers", speakers: ["theresa-hoover"], description: "Ditch the digital clutter and stop hunting for that one slide deck five minutes before class starts. Discover practical Google Workspace systems—from Drive folders to lesson-planning workflows—built specifically for the way elementary music teachers work." },
+        { title: "Sub Smarter, Not Harder", speakers: ["rainy-montague"], description: "Take a sick day or personal day without spending four hours writing emergency sub plans the night before. Build a stress-free, plug-and-play sub tub that keeps your students engaged and musical—even when your sub doesn't read a single note." },
       ],
     },
     {
@@ -174,9 +174,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: You bring a rich toolbox of approaches to your teaching. Lean into this strength by building lessons around the approaches your students respond to most.',
       growthCopy: 'PLACEHOLDER: Growing your toolbox of approaches like Kodály, Orff and Dalcroze helps every student find a way into the music.',
       trainings: [
-        { title: "Different Ways to Use Boomwhackers", speakers: ["tyler-swick"] },
-        { title: "Instant Improvisation with Rhythmic Building Blocks", speakers: ["david-row"] },
-        { title: "Strategies for Keeping Upper Elementary Students Excited About Choir", speakers: ["bryson-tarbet"] },
+        { title: "Different Ways to Use Boomwhackers", speakers: ["tyler-swick"], description: "Go way beyond basic play-along videos and unlock the full musical potential of your Boomwhackers. Walk away with fresh, creative ways to teach rhythm, melody, harmony, and ensemble skills across multiple grade levels." },
+        { title: "Instant Improvisation with Rhythmic Building Blocks", speakers: ["david-row"], description: "Take the intimidation out of improvisation for both you and your students. Learn a simple, repeatable framework using rhythmic building blocks that gets every child creating original music with confidence in a single class period." },
+        { title: "Strategies for Keeping Upper Elementary Students Excited About Choir", speakers: ["bryson-tarbet"], description: "Win over your reluctant 4th- and 5th-grade singers and turn choir into the highlight of their week. Explore practical rehearsal strategies, repertoire tips, and culture-building habits that boost buy-in and keep upper elementary students coming back." },
       ],
     },
     {
@@ -195,9 +195,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: Your classroom is a place where every student belongs. Lean into this strength by making your adaptations part of how you plan every unit.',
       growthCopy: 'PLACEHOLDER: Practical strategies for differentiation and inclusion help every student take part fully, without adding hours to your planning.',
       trainings: [
-        { title: "Harmony in the Hyphen: Embracing Filipino-American Heritage Through Music, Dance, & Identity", speakers: ["melissa-fuller-flores"] },
-        { title: "Guided Accessibility Audit", speakers: ["bryson-tarbet"] },
-        { title: "Culturally Responsive Music Ed in Action", speakers: ["ashley-cuthbertson"] },
+        { title: "Harmony in the Hyphen: Embracing Filipino-American Heritage Through Music, Dance, & Identity", speakers: ["melissa-fuller-flores"], description: "Deepen your students' connection to culture and identity through authentic Filipino-American music and movement. Gain ready-to-use songs, dances, and respectful teaching context you can bring into your classroom right away." },
+        { title: "Guided Accessibility Audit", speakers: ["bryson-tarbet"], description: "Spot the hidden barriers in your music room before they hold a student back. Walk step-by-step through your physical space, materials, and routines to make simple, high-impact adjustments that ensure every learner can fully participate." },
+        { title: "Culturally Responsive Music Ed in Action", speakers: ["ashley-cuthbertson"], description: "Move past buzzwords and see what culturally responsive teaching actually looks like in a K–5 music room. Learn concrete strategies for selecting repertoire, honoring student backgrounds, and creating a classroom where every child feels seen and valued." },
       ],
     },
     {
@@ -216,9 +216,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: You plan with purpose and know where your students are headed. Lean into this strength by using your long-range plan to make room for creativity and student choice.',
       growthCopy: 'PLACEHOLDER: A clear long-range plan, well-paced lessons and simple assessments make every class period count and take the guesswork out of your week.',
       trainings: [
-        { title: "Elementary Music Centers 101", speakers: ["becca-davis"] },
-        { title: "Work Smarter, Not Harder: Double Duty Songs", speakers: ["tanya-lejeune", "carrie-nicholas"] },
-        { title: "Low-Stress Concert Planning", speakers: ["bryson-tarbet"] },
+        { title: "Elementary Music Centers 101", speakers: ["becca-davis"], description: "Ready to try music centers without the classroom chaos? Learn how to design, prep, and manage independent, high-engagement learning stations that reinforce musical concepts while giving you time to assess and connect with small groups." },
+        { title: "Work Smarter, Not Harder: Double Duty Songs", speakers: ["tanya-lejeune", "carrie-nicholas"], description: "Stop reinventing the wheel for every single grade level. Discover how to stretch your favorite songs across multiple concepts, skills, and age groups so you spend less time planning and more time making music." },
+        { title: "Low-Stress Concert Planning", speakers: ["bryson-tarbet"], description: "Take the overwhelm out of performance season with a clear, repeatable concert-planning system. From picking repertoire and organizing rehearsals to communicating with families, learn how to pull off memorable shows without burning out." },
       ],
     },
     {
@@ -237,9 +237,9 @@ export const CONFIG = {
       foundationCopy: 'PLACEHOLDER: You find joy and purpose in your work. Lean into this strength by protecting the habits that keep you balanced, and let that energy carry into your classroom.',
       growthCopy: 'PLACEHOLDER: You can only pour from a full cup. Support, balance and self-advocacy help you keep loving this work for the long haul.',
       trainings: [
-        { title: "Bye-Bye Teaching Frenzy", speakers: ["grace-stevens"] },
-        { title: "The Performance Season Pressure Release", speakers: ["bryson-tarbet"] },
-        { title: "Teacher’s Pet: Loving Your Voice While Teaching Your Students", speakers: ["jennifer-whitehead"] },
+        { title: "Bye-Bye Teaching Frenzy", speakers: ["grace-stevens"], description: "Step off the hamster wheel of constant exhaustion and reclaim your calm during the school day. Learn practical mindset shifts and boundary-setting strategies designed to help busy music teachers reduce stress and feel grounded again." },
+        { title: "The Performance Season Pressure Release", speakers: ["bryson-tarbet"], description: "When concert prep starts taking over your evenings and weekends, hit pause with this quick, grounding reset. Let go of perfectionism, refocus on what actually matters for your students, and protect your peace through your busiest weeks." },
+        { title: "Teacher’s Pet: Loving Your Voice While Teaching Your Students", speakers: ["jennifer-whitehead"], description: "Your voice is your most important instrument—and teaching K–5 music all day puts it to the test. Learn practical vocal health habits, warm-ups, and classroom techniques to prevent fatigue, protect your voice, and still model healthy singing for your students." },
       ],
     },
   ],

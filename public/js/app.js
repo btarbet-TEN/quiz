@@ -307,19 +307,32 @@ function resultsHtml() {
       </li>`;
   }).join('');
 
-  const trainings = growth.trainings.map((training) => `
+  const trainings = growth.trainings.map((training, index) => {
+    const id = `training-details-${index}`;
+    const speakers = training.speakers.map((speakerId) => {
+      const speaker = SPEAKERS[speakerId];
+      return `<span class="training__speaker">
+        <img src="${esc(speaker.headshot)}" alt="" width="48" height="48" loading="lazy" decoding="async">
+        <span>${esc(speaker.name)}</span>
+      </span>`;
+    }).join('');
+    return `
     <li class="training">
-      <p class="training__title">${esc(training.title)}</p>
-      <ul class="training__speakers">
-        ${training.speakers.map((id) => {
-          const speaker = SPEAKERS[id];
-          return `<li class="training__speaker">
-            <img src="${esc(speaker.headshot)}" alt="" width="48" height="48" loading="lazy" decoding="async">
-            <span>${esc(speaker.name)}</span>
-          </li>`;
-        }).join('')}
-      </ul>
-    </li>`).join('');
+      <button class="training__button" type="button" aria-haspopup="dialog" aria-controls="${id}">
+        <span class="training__title">${esc(training.title)}</span>
+        <span class="training__speakers">${speakers}</span>
+        <span class="training__details-link">View session details <span aria-hidden="true">→</span></span>
+      </button>
+      <dialog class="training-dialog" id="${id}" aria-labelledby="${id}-title">
+        <h2 id="${id}-title">${esc(training.title)}</h2>
+        <div class="training__speakers">${speakers}</div>
+        <p class="training-dialog__description">${esc(training.description)}</p>
+        <form method="dialog">
+          <button type="submit" class="btn btn--ghost">Close</button>
+        </form>
+      </dialog>
+    </li>`;
+  }).join('');
 
   const also = r.alsoAttention.length
     ? `<p class="also"><strong>${esc(c.alsoAttentionLabel)}</strong> ${r.alsoAttention.map((s) => esc(BY_SLUG[s].name)).join(', ')}</p>`
@@ -357,7 +370,7 @@ function resultsHtml() {
           <p>${esc(growth.growthCopy)}</p>
           ${also}
           <h3>${esc(c.trainingsHeading)}</h3>
-          <ol class="trainings">${trainings}</ol>
+          <ul class="trainings">${trainings}</ul>
         </article>
       </div>
 
@@ -574,6 +587,11 @@ function bindGate() {
 }
 
 function bindResults() {
+  for (const button of $main.querySelectorAll('.training__button')) {
+    const dialog = $main.querySelector('#' + button.getAttribute('aria-controls'));
+    button.addEventListener('click', () => dialog.showModal());
+  }
+
   renderChart();
   const r = results();
   const growthName = BY_SLUG[r.growth].name;
