@@ -538,7 +538,7 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
   text-transform: uppercase;
   margin-bottom: 14px;
 }
-.results-hero h1 { font-size: calc(var(--step-h1) * 0.88); }
+.results-hero h1 { font-size: calc(var(--step-h1) * 0.70); }
 .results-hero h1 .pillar-name { display: block; font-size: calc(var(--step-h1) * 1.25); margin-top: 0.15em; }
 
 .results-chart {
