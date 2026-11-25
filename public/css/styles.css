@@ -217,7 +217,7 @@ main:focus { outline: none; }
 .screen { max-width: 720px; margin: 0 auto; }
 .screen--results { max-width: 1040px; }
 @media (min-width: 768px) {
-  .screen--intro, .screen--question, .screen--gate { max-width: 1040px; }
+  .screen { max-width: 1040px; }
 }
 
 .lead { font-size: clamp(1.05rem, 1rem + 0.4vw, 1.25rem); line-height: 1.55; }
@@ -279,7 +279,6 @@ body[data-screen="intro"] .site-header { padding-bottom: 0; }
 .intro__title { font-size: var(--step-hero); line-height: 1.04; margin-bottom: 0.45em; }
 .intro__title span { display: block; }
 .intro__panel {
-  max-width: 720px;
   position: relative;
   background: var(--mint);
   border-radius: var(--radius);
