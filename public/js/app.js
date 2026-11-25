@@ -307,6 +307,7 @@ function resultsHtml() {
   const c = CONFIG.copy.results;
   const growth = BY_SLUG[r.growth];
   const foundation = BY_SLUG[r.foundation];
+  const edgeLink = `<a class="btn" data-action="edge" href="${esc(edgeUrl(growth.slug))}" target="_blank" rel="noopener">${esc(c.supportButton)}<span class="visually-hidden"> (opens in a new tab)</span></a>`;
 
   const scoreItems = PILLARS.map((p) => {
     const score = r.scores[p.slug];
@@ -338,7 +339,8 @@ function resultsHtml() {
         <h2 id="${id}-title">${esc(training.title)}</h2>
         <div class="training__speakers">${speakerCredit}</div>
         <p class="training-dialog__description">${esc(training.description)}</p>
-        <form method="dialog">
+        <form class="training-dialog__actions" method="dialog">
+          ${edgeLink}
           <button type="submit" class="btn btn--ghost">Close</button>
         </form>
       </dialog>
@@ -388,7 +390,7 @@ function resultsHtml() {
       <section class="support" aria-labelledby="support-h">
         <h2 id="support-h">${esc(c.supportHeading)}</h2>
         <p>${esc(c.supportBody)}</p>
-        <a class="btn" data-action="edge" href="${esc(edgeUrl(growth.slug))}" target="_blank" rel="noopener">${esc(c.supportButton)}<span class="visually-hidden"> (opens in a new tab)</span></a>
+        ${edgeLink}
       </section>
 
       <section class="download" aria-labelledby="download-h" data-clarity-mask="true">
@@ -623,7 +625,9 @@ function bindResults() {
   const idle = window.requestIdleCallback || ((fn) => window.setTimeout(fn, 400));
   idle(() => { preparePdf().catch(() => {}); });
 
-  $main.querySelector('[data-action="edge"]').addEventListener('click', () => track.edgeCtaClick(growthName));
+  for (const link of $main.querySelectorAll('[data-action="edge"]')) {
+    link.addEventListener('click', () => track.edgeCtaClick(growthName));
+  }
 
   const btn = $main.querySelector('[data-action="download"]');
   const status = $main.querySelector('[data-download-status]');

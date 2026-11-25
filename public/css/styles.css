@@ -586,8 +586,8 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
 .cards { --card-gap: 20px; display: grid; gap: var(--card-gap); margin-bottom: var(--card-gap); }
 .card { border-radius: var(--radius); padding: clamp(20px, 4vw, 36px); border: 2px solid var(--ink); background: var(--white); }
 .card--growth { background: var(--mint); border-color: var(--mint); }
-.card h2 { font-size: var(--step-h2); }
-.card h2 .pillar-name { display: block; margin-top: 0.2em; }
+.card > h2 { font-size: calc(var(--step-h2) * 0.82); }
+.card > h2 .pillar-name { display: block; font-size: var(--step-h2); margin-top: 0.2em; }
 .card h3 { font-size: 1rem; margin-top: 1.6em; }
 .also { background: var(--white); border-radius: 10px; padding: 12px 14px; font-size: 0.95rem; }
 .trainings { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
@@ -639,6 +639,7 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
 .training-dialog::backdrop { background: rgba(28, 33, 32, 0.55); }
 .training-dialog h2 { font-size: var(--step-h2); overflow-wrap: anywhere; }
 .training-dialog__description { margin: 20px 0; }
+.training-dialog__actions { display: flex; flex-wrap: wrap; gap: 10px; }
 @media (min-width: 900px) {
   .trainings { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
