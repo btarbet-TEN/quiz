@@ -595,7 +595,7 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
 .training__button {
   width: 100%;
   height: 100%;
-  padding: 18px;
+  padding: 18px 14px;
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -616,10 +616,11 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
 .training__speaker { display: flex; min-height: 48px; align-items: center; gap: 8px; color: var(--grey); font-size: 0.92rem; }
 .training__portraits { display: flex; flex: 0 0 auto; align-items: center; }
 .training__speaker img { flex: 0 0 48px; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; object-position: center 40%; background: var(--mint); }
+.training__button .training__speaker--group { font-size: 0.8rem; gap: 6px; }
 .training__speaker--group img {
-  flex-basis: 38px;
-  width: 38px;
-  height: 38px;
+  flex-basis: 34px;
+  width: 34px;
+  height: 34px;
   border: 2px solid var(--white);
 }
 .training__speaker--group img + img { margin-left: -10px; }
