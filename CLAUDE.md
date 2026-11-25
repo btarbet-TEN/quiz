@@ -172,7 +172,7 @@ notice, not a consent gate (dismissal stored in `localStorage` key `ten-cookie-n
 
 All paths get `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`,
 `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `X-Frame-Options: DENY`, and a
-browser-enforced `Content-Security-Policy`. The policy allows the site and Flodesk. The PDF
+browser-enforced `Content-Security-Policy`. The public policy allows the site and Flodesk. Quiz preview URLs additionally allow the Vercel review toolbar. The PDF
 requires `data:` and `blob:` images, and inline styles support the score bars and form.
 The browser test serves the same headers and fails on policy violations. Before enabling a
 tracker, validate its required origins in a preview and update the policy and tracker ID together.

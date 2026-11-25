@@ -34,10 +34,36 @@
         {
           "key": "X-Frame-Options",
           "value": "DENY"
-        },
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "missing": [
+        {
+          "type": "host",
+          "value": "ten-pillar-quiz-[a-z0-9-]+-bryson-2285s-projects\\.vercel\\.app"
+        }
+      ],
+      "headers": [
         {
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self' https://assets.flodesk.com https://*.flodesk.com; style-src 'self' 'unsafe-inline' https://assets.flodesk.com https://*.flodesk.com; font-src 'self' https://assets.flodesk.com https://*.flodesk.com; img-src 'self' data: blob: https://*.flodesk.com; connect-src 'self' https://*.flodesk.com; frame-src https://*.flodesk.com; object-src 'none'; base-uri 'self'; form-action 'self' https://*.flodesk.com; frame-ancestors 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "ten-pillar-quiz-[a-z0-9-]+-bryson-2285s-projects\\.vercel\\.app"
+        }
+      ],
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://assets.flodesk.com https://*.flodesk.com https://vercel.live; style-src 'self' 'unsafe-inline' https://assets.flodesk.com https://*.flodesk.com https://vercel.live; font-src 'self' https://assets.flodesk.com https://*.flodesk.com https://vercel.live https://assets.vercel.com; img-src 'self' data: blob: https://*.flodesk.com https://vercel.live https://vercel.com; connect-src 'self' https://*.flodesk.com https://vercel.live wss://ws-us3.pusher.com; frame-src https://*.flodesk.com https://vercel.live; object-src 'none'; base-uri 'self'; form-action 'self' https://*.flodesk.com; frame-ancestors 'none'"
         }
       ]
     },

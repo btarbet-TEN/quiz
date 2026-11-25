@@ -31,13 +31,16 @@ const TYPES = {
 };
 // Send the same headers Vercel would (vercel.json), so CSP violations show up here too.
 const vercel = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'));
-const headersFor = (pathname) => Object.fromEntries((vercel.headers || [])
+const hostMatches = (rule, host) => rule.type === 'host' && new RegExp(`^(?:${rule.value})$`).test(host);
+const headersFor = (pathname, host) => Object.fromEntries((vercel.headers || [])
   .filter((rule) => new RegExp(`^${rule.source}$`).test(pathname))
+  .filter((rule) => (rule.has || []).every((condition) => hostMatches(condition, host)) &&
+    (rule.missing || []).every((condition) => !hostMatches(condition, host)))
   .flatMap((rule) => rule.headers.map((h) => [h.key, h.value])));
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
-  Object.entries(headersFor(url.pathname)).forEach(([k, v]) => res.setHeader(k, v));
+  Object.entries(headersFor(url.pathname, req.headers.host?.split(':')[0] || '')).forEach(([k, v]) => res.setHeader(k, v));
   let file = path.join(pub, decodeURIComponent(url.pathname));
   if (!file.startsWith(pub)) { res.writeHead(403).end(); return; }
   if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
