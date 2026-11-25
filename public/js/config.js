@@ -124,7 +124,6 @@ export const CONFIG = {
     },
     footer: {
       copyright: '© Tarbet Education Network',
-      trademark: 'Elementary Music EDGE® is a registered trademark of That Music Teacher, LLC.',
     },
     pdf: {
       filename: 'My-Elementary-Music-Success-Scorecard.pdf',

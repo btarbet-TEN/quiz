@@ -86,7 +86,7 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 ### Other
 - **PDF scorecard:** generated in the browser on one letter-size page, with the TEN logo, scores, radar chart, foundation and growth pillars, growth plan, trainings and a footer.
 - **Cookie notice bar:** shown on the first visit and remembered once dismissed.
-- **Footer:** copyright, the EDGE® trademark line, and Privacy, Terms, Disclaimer and Contact links, which open in new tabs.
+- **Footer:** copyright with Privacy, Terms, Disclaimer and Contact links on one line where space allows.
 - **Meta and social tags:** page title, description, and Open Graph and Twitter tags (OG image is a placeholder).
 
 ### Changes made after the first build (at your request)

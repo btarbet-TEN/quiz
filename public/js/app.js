@@ -132,16 +132,14 @@ function renderLogo() {
 function renderFooter() {
   const f = CONFIG.copy.footer;
   const L = CONFIG.links;
-  // Links open in a new tab so nobody loses their progress.
-  const link = (href, text) => `<a href="${esc(href)}"${href.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}>${esc(text)}</a>`;
+  const link = (href, text) => `<span class="site-footer__item"><span class="site-footer__divider" aria-hidden="true">|</span><a href="${esc(href)}"${href.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}>${esc(text)}</a></span>`;
   document.getElementById('site-footer').innerHTML = `
     <div class="site-footer__inner">
       <p>${esc(f.copyright)}</p>
-      <p>${esc(f.trademark)}</p>
       <nav aria-label="Legal">
-        ${link(L.privacy, 'Privacy Policy')}<span aria-hidden="true">|</span>
-        ${link(L.terms, 'Terms of Use')}<span aria-hidden="true">|</span>
-        ${link(L.disclaimer, 'Disclaimer')}<span aria-hidden="true">|</span>
+        ${link(L.privacy, 'Privacy Policy')}
+        ${link(L.terms, 'Terms of Use')}
+        ${link(L.disclaimer, 'Disclaimer')}
         ${link(L.contact, 'Contact')}
       </nav>
     </div>`;

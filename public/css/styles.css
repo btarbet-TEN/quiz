@@ -647,11 +647,16 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
   border-top: 1px solid var(--rule);
   background: var(--white);
 }
-.site-footer__inner { max-width: 1040px; margin: 0 auto; text-align: center; }
-.site-footer p { margin: 0 0 0.35em; }
-.site-footer nav { margin-top: 0.9em; display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 0; }
-.site-footer nav a { color: var(--grey); padding: 6px 4px; }
-.site-footer nav span[aria-hidden] { padding: 6px 4px; }
+.site-footer__inner { max-width: 1040px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; text-align: center; }
+.site-footer p { margin: 0; }
+.site-footer nav { display: flex; flex-wrap: wrap; justify-content: center; }
+.site-footer__item { display: inline-flex; align-items: center; }
+.site-footer__divider { padding: 0 4px; }
+.site-footer nav a { color: var(--grey); padding: 6px 4px; white-space: nowrap; }
+@media (max-width: 520px) {
+  .site-footer p { flex-basis: 100%; }
+  .site-footer__item:first-child .site-footer__divider { display: none; }
+}
 
 /* --- Cookie bar ---------------------------------------------------------- */
 .cookie-bar {

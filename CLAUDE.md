@@ -137,7 +137,7 @@ notice, not a consent gate (dismissal stored in `localStorage` key `ten-cookie-n
 - Privacy /privacy, Terms /tou, Disclaimer /disclaimer on thatmusicteacher.com; Contact mailto:hello@thatmusicteacher.com.
 - Footer links always open in a new tab (so progress is never lost). The EDGE button and the results-page
   logo also open in a new tab, so the teacher keeps their results.
-- Footer shows only the copyright, trademark line and legal links (the "answers stay on your device" /
+- Footer shows only the copyright and legal links (the "answers stay on your device" /
   "self-reflection tool" notes were removed at the owner's request). The PDF-name field has no hint text.
 - Header logo is not a link during the quiz; on results it links to https://tarbeteducationnetwork.com.
 
