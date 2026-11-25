@@ -102,7 +102,7 @@ export const CONFIG = {
       scoresHeading: 'Your Pillar Scores',
       foundationHeadingPrefix: 'Your Foundation Pillar:',
       growthHeadingPrefix: 'Your Growth Plan:',
-      trainingsHeading: 'Recommended EDGE Trainings',
+      trainingsHeading: 'Recommended Trainings',
       alsoAttentionLabel: 'Also worth your attention:',
       // One-line definitions shown under "Your Pillar Scores".
       growthDefinition: 'Your lowest-scoring pillar, where focused growth will make the biggest difference.',
