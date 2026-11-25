@@ -106,9 +106,7 @@ export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRender
   // Open shadow roots may update without notifying the container observer.
   const poll = setInterval(checkForm, 250);
 
-  const beginSubmission = (form) => {
-    if (!form || (!container.contains(form) && !queryAllDeep(container, 'form').includes(form))) return;
-    if (!form.checkValidity()) return;
+  const beginSubmission = () => {
     submitted = true;
     onPending();
     // Read now: Flodesk may clear the fields once it shows its success state.
@@ -120,15 +118,15 @@ export function mountGateForm(host, growthSlug, { onSuccess, onBlocked, onRender
     }, CONFIG.flodesk.confirmationTimeoutMs);
   };
   // The hosted form can handle a submit-button click without emitting a native submit.
-  const onSubmit = (event) => beginSubmission(event.target);
+  const onSubmit = () => beginSubmission();
   const onClick = (event) => {
     const button = event.composedPath().find((node) => node.matches?.('button[type="submit"], input[type="submit"]'));
-    if (button) beginSubmission(button.form);
+    if (button) beginSubmission();
   };
   const onKeyDown = (event) => {
     if (event.key !== 'Enter' || event.isComposing) return;
     const field = event.composedPath().find((node) => node.matches?.('input'));
-    if (field) beginSubmission(field.form);
+    if (field) beginSubmission();
   };
   container.addEventListener('input', captureName, true);
   container.addEventListener('submit', onSubmit, true);
