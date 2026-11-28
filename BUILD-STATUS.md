@@ -32,9 +32,9 @@ _Last updated: October 8, 2026 (after the privacy/QA audit fixes)_
 
 ### Scoring (unit-tested, 11 tests passing)
 - **Pillar score:** the sum of its 5 ratings, from 5 to 25.
-- **Growth Pillar:** the lowest score. Ties go to the earliest pillar in framework order. Other pillars tied for lowest appear as "also worth your attention."
-- **Foundation Pillar:** the highest score, excluding the growth pillar, with the same tie-break.
-- **All five equal:** growth is Expectations & Procedures and foundation is Approaches & Pedagogy.
+- **Growth Pillar:** the lowest score. Teachers choose among any tied lowest pillars before signup. Other lowest-scoring pillars appear as "also worth your attention."
+- **Foundation Pillar:** the highest score, excluding the Growth Pillar, with ties resolved by framework order.
+- **All five equal:** the teacher can choose any pillar for Growth. Foundation is the first remaining pillar in framework order.
 
 **Framework order:** Expectations & Procedures → Approaches & Pedagogy → Inclusion & Differentiation → Curriculum & Planning → Teacher Fulfillment.
 

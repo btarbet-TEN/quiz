@@ -21,7 +21,7 @@ statements (5 pillars × 5), see a radar chart, and learn their **Growth Pillar*
 ## Flow
 
 Intro → About page ("Before you begin": framework, five pillars, how it works; copy in `copy.about`)
-→ 5 pillar screens (one per pillar, framework order) → email gate (Flodesk) → results.
+→ 5 pillar screens (one per pillar, framework order) → Growth Pillar choice if the lowest score is tied → email gate (Flodesk) → results.
 Rating buttons span the width of the statement text (indented past the number badge).
 Next looks disabled (`aria-disabled`, not `disabled`) until all 5 statements are answered; tapping it
 early shows "Answer all 5 statements to continue." in the nav bar and highlights/scrolls to the missing
@@ -49,16 +49,12 @@ All storage calls are wrapped in try/catch.
 
 Statement wording and pillar descriptions are approved copy. Don't edit them without being asked.
 
-## Scoring rules
+## Scoring
 
-- Pillar score = sum of its 5 ratings (1–5 each), range 5–25.
-- **Growth** = lowest score. Ties → earliest pillar in framework order.
-- Other pillars tied for lowest → "Also worth your attention" (shown in the growth card and PDF).
-  The foundation pillar is never listed there, and when **all five are equal nothing is listed**.
-- `pickPillars` also returns `allEqual`, `growthTied`, `foundationTied`; the results page shows a short
-  tie-break note under the scores when any pick was decided by framework order.
-- **Foundation** = highest score **excluding the growth pillar**. Ties → framework order.
-- All five equal → growth = Expectations & Procedures, foundation = Approaches & Pedagogy.
+- Each pillar totals five ratings for a score from 5 to 25. Growth is the lowest score.
+- If two or more pillars share the lowest score, the teacher chooses among them before signup. The choice is stored with quiz progress and used by the Flodesk gate, results, and PDF. Existing unlocked results keep their original pick.
+- Foundation is the highest score after excluding Growth, with ties resolved by framework order. The results name other pillars tied for Foundation.
+- Other lowest-scoring pillars appear under “Also worth your attention.” When all five tie, all five are available on the choice screen and no additional-pillar list is shown.
 
 ## Privacy model
 

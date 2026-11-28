@@ -90,6 +90,12 @@ export const CONFIG = {
       finish: 'See My Results',
       incomplete: 'Answer all 5 statements to continue.',
     },
+    tie: {
+      heading: 'Where would you like to start?',
+      explanation: 'These pillars tied at {score}/25. Choose the one you’d most like to work on first.',
+      allEqual: 'Your scores are even across all five pillars. Choose the one you’d most like to work on first.',
+      prompt: 'Choose your Growth Pillar',
+    },
     gate: {
       heading: 'Your results are ready.',
       subtext: 'Enter your name and email to see your scorecard and personalized growth plan.',
@@ -109,7 +115,10 @@ export const CONFIG = {
       foundationDefinition: 'Your strongest pillar, a strength to build on.',
       // Shown when a pick was decided by framework order rather than a clear score.
       tieAllEqual: 'All five of your scores are tied, so your Growth and Foundation Pillars were chosen by their order in the framework.',
-      tieSome: 'Some of your scores are tied. When pillars tie, the one that comes first in the framework is chosen.',
+      tieAllEqualChosen: 'Your scores were even across all five pillars. You chose where to start, and the first remaining pillar in the framework is shown as your Foundation Pillar.',
+      tieGrowthChosen: 'You chose your Growth Pillar from the pillars tied for your lowest score.',
+      tieLegacyGrowth: 'Your Growth Pillar tied with another area. The first tied pillar in the framework was chosen.',
+      tieFoundation: 'These pillars scored equally high: {pillars}. Your Foundation Pillar appears first in the framework order.',
       supportHeading: 'The support you need',
       supportBody: 'Every training recommended above lives inside Elementary Music EDGE®, the professional development membership for elementary music teachers. Join to start your growth plan today, with on-demand trainings, ready-to-use resources and a community of music teachers who get it.',
       supportButton: 'Join Elementary Music EDGE®',

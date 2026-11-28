@@ -126,3 +126,26 @@ test('results require complete, in-range integer ratings for at least two pillar
   }
   assert.throws(() => computeResults(answers, []), RangeError);
 });
+
+test('a valid growth choice drives results without changing scores or foundation', () => {
+  const answers = Object.fromEntries(ORDER.map((slug, i) => [slug, Array(5).fill([2, 4, 5, 2, 4][i])]));
+  const picked = computeResults(answers, ORDER, CP);
+  assert.deepEqual(picked.scores, s(10, 20, 25, 10, 20));
+  assert.deepEqual(picked.growthOptions, [EP, CP]);
+  assert.equal(picked.growth, CP);
+  assert.equal(picked.growthChosen, true);
+  assert.equal(picked.foundation, ID);
+  assert.deepEqual(picked.alsoAttention, [EP]);
+  assert.equal(computeResults(answers, ORDER, ID).growth, EP);
+});
+
+test('all five tied allows any growth choice and picks foundation from the other four', () => {
+  const scores = s(15, 15, 15, 15, 15);
+  for (const choice of ORDER) {
+    const picked = pickPillars(scores, ORDER, choice);
+    assert.deepEqual(picked.growthOptions, ORDER);
+    assert.equal(picked.growth, choice);
+    assert.equal(picked.foundation, ORDER.find((slug) => slug !== choice));
+    assert.deepEqual(picked.alsoAttention, []);
+  }
+});

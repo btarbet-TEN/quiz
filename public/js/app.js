@@ -28,7 +28,7 @@ let reviewScreenSelect;
 // ---------------------------------------------------------------------------
 const emptyAnswers = () => Object.fromEntries(ORDER.map((slug) => [slug, Array(STATEMENTS_PER_PILLAR).fill(null)]));
 
-let state = { screen: 'intro', step: 0, answers: emptyAnswers(), unlocked: false };
+let state = { screen: 'intro', step: 0, answers: emptyAnswers(), unlocked: false, growthChoice: null };
 let gateCleanup = null;
 // First name typed into the Flodesk form, kept in memory only to prefill the PDF name field.
 let gateFirstName = '';
@@ -59,9 +59,15 @@ function loadState() {
         }
       }
     }
-    const screen = ['intro', 'about', 'question', 'gate', 'results'].includes(saved.screen) ? saved.screen : 'intro';
+    const screen = ['intro', 'about', 'question', 'tie', 'gate', 'results'].includes(saved.screen) ? saved.screen : 'intro';
     const step = Math.min(Math.max((Number.isInteger(saved.step) ? saved.step : 0), 0), ORDER.length - 1);
-    state = { screen, step, answers, unlocked: saved.unlocked === true };
+    state = { screen, step, answers, unlocked: saved.unlocked === true, growthChoice: saved.growthChoice ?? null };
+    const complete = ORDER.every((slug) => isPillarComplete(answers, slug));
+    if (!complete) state.unlocked = false;
+    if (state.growthChoice !== null && (!complete || !results().growthChosen)) {
+      state.growthChoice = null;
+      state.unlocked = false;
+    }
   } catch (e) { /* storage blocked or corrupt: start fresh */ }
 }
 
@@ -76,20 +82,25 @@ function clearState() {
   for (const store of ['localStorage', 'sessionStorage']) {
     try { window[store].removeItem(STORAGE_KEY); } catch (e) { /* storage blocked */ }
   }
-  state = { screen: 'intro', step: 0, answers: emptyAnswers(), unlocked: false };
+  state = { screen: 'intro', step: 0, answers: emptyAnswers(), unlocked: false, growthChoice: null };
   gateFirstName = '';
 }
 
 /** Adjust a requested screen so nobody lands somewhere they haven't earned yet. */
 function allowedScreen(screen, step) {
   const complete = ORDER.every((s) => isPillarComplete(state.answers, s));
-  if ((screen === 'gate' || screen === 'results') && !complete) {
+  if (['tie', 'gate', 'results'].includes(screen) && !complete) {
     const firstIncomplete = ORDER.findIndex((s) => !isPillarComplete(state.answers, s));
     return { screen: 'question', step: Math.max(firstIncomplete, 0) };
   }
   if (screen === 'question') {
     const firstIncomplete = ORDER.findIndex((slug) => !isPillarComplete(state.answers, slug));
     if (firstIncomplete !== -1) step = Math.min(step, firstIncomplete);
+  }
+  if (['tie', 'gate', 'results'].includes(screen)) {
+    const result = results();
+    if (result.growthTied && !result.growthChosen && !state.unlocked) return { screen: 'tie', step };
+    if (screen === 'tie' && !result.growthTied) screen = 'gate';
   }
   if (screen === 'results' && !state.unlocked) return { screen: 'gate', step };
   if (screen === 'gate' && state.unlocked) return { screen: 'results', step };
@@ -117,7 +128,7 @@ function edgeUrl(growthSlug) {
 }
 
 function results() {
-  return computeResults(state.answers, ORDER);
+  return computeResults(state.answers, ORDER, state.growthChoice);
 }
 
 // ---------------------------------------------------------------------------
@@ -272,6 +283,31 @@ function questionHtml(step) {
     </section>`;
 }
 
+function tieHtml() {
+  const r = results();
+  const c = CONFIG.copy.tie;
+  const options = r.growthOptions.map((slug) => `
+    <label class="tie-option">
+      <input type="radio" name="growth-pillar" value="${esc(slug)}" required${state.growthChoice === slug ? ' checked' : ''}>
+      <span>${esc(BY_SLUG[slug].name)}</span>
+    </label>`).join('');
+  return `
+    <section class="screen screen--tie" aria-labelledby="screen-heading">
+      <h1 id="screen-heading" class="pillar-title" tabindex="-1">${esc(c.heading)}</h1>
+      <p class="lead">${esc(r.allEqual ? c.allEqual : c.explanation.replace('{score}', r.scores[r.growth]))}</p>
+      <form data-growth-choice>
+        <fieldset class="tie-options">
+          <legend>${esc(c.prompt)}</legend>
+          ${options}
+        </fieldset>
+        <div class="quiz-nav">
+          <button type="button" class="btn btn--ghost" data-action="back">Back</button>
+          <button type="submit" class="btn" data-action="next">Continue</button>
+        </div>
+      </form>
+    </section>`;
+}
+
 function gateHtml() {
   const c = CONFIG.copy.gate;
   return `
@@ -351,7 +387,12 @@ function resultsHtml() {
     ? `<p class="also"><strong>${esc(c.alsoAttentionLabel)}</strong> ${r.alsoAttention.map((s) => esc(BY_SLUG[s].name)).join(', ')}</p>`
     : '';
 
-  const tieNote = r.allEqual ? c.tieAllEqual : (r.growthTied || r.foundationTied) ? c.tieSome : '';
+  const tieNotes = r.allEqual
+    ? [r.growthChosen ? c.tieAllEqualChosen : c.tieAllEqual]
+    : [
+        r.growthTied ? (r.growthChosen ? c.tieGrowthChosen : c.tieLegacyGrowth) : '',
+        r.foundationTied ? c.tieFoundation.replace('{pillars}', r.foundationPeers.map((slug) => BY_SLUG[slug].name).join(', ')) : '',
+      ].filter(Boolean);
 
   return `
     <section class="screen screen--results" aria-labelledby="screen-heading">
@@ -369,7 +410,7 @@ function resultsHtml() {
             <div><dt><span class="tag">Growth</span></dt><dd>${esc(c.growthDefinition)}</dd></div>
             <div><dt><span class="tag">Foundation</span></dt><dd>${esc(c.foundationDefinition)}</dd></div>
           </dl>
-          ${tieNote ? `<p class="tie-note">${esc(tieNote)}</p>` : ''}
+          ${tieNotes.map((note) => `<p class="tie-note">${esc(note)}</p>`).join('')}
         </div>
       </div>
 
@@ -459,11 +500,13 @@ function render({ focus = true } = {}) {
   if (state.screen === 'intro') $main.innerHTML = introHtml();
   else if (state.screen === 'about') $main.innerHTML = aboutHtml();
   else if (state.screen === 'question') $main.innerHTML = questionHtml(state.step);
+  else if (state.screen === 'tie') $main.innerHTML = tieHtml();
   else if (state.screen === 'gate') $main.innerHTML = gateHtml();
   else $main.innerHTML = resultsHtml();
 
   if (state.screen === 'about') bindAbout();
   if (state.screen === 'question') bindQuestion();
+  if (state.screen === 'tie') bindTie();
   if (state.screen === 'gate') {
     if (reviewMode) {
       $main.querySelector('[data-action="back"]').addEventListener('click', () => go('question', PILLARS.length - 1));
@@ -480,13 +523,15 @@ function render({ focus = true } = {}) {
 
   if (reviewScreenSelect) {
     const step = state.screen === 'results' ? ORDER.indexOf(results().growth) : state.step;
-    reviewScreenSelect.value = ['question', 'results'].includes(state.screen) ? `${state.screen}:${step}` : state.screen;
+    reviewScreenSelect.value = state.screen === 'tie' ? `tie:${Number(results().allEqual)}`
+      : ['question', 'results'].includes(state.screen) ? `${state.screen}:${step}` : state.screen;
   }
 
   const announcements = {
     intro: CONFIG.copy.intro.heading.join(' '),
     about: CONFIG.copy.about.heading,
     question: `Pillar ${state.step + 1} of ${PILLARS.length}: ${PILLARS[state.step].name}`,
+    tie: CONFIG.copy.tie.heading,
     gate: CONFIG.copy.gate.heading,
     results: state.screen === 'results' ? `Your results. Growth Pillar: ${BY_SLUG[results().growth].name}` : '',
   };
@@ -525,7 +570,15 @@ function bindQuestion() {
   form.addEventListener('change', (e) => {
     const input = e.target;
     if (input.type !== 'radio') return;
+    const previous = state.growthChoice || state.unlocked ? results() : null;
     state.answers[p.slug][Number(input.dataset.index)] = Number(input.value);
+    if (previous) {
+      const updated = results();
+      if (!updated.growthChosen) state.growthChoice = null;
+      if (updated.growth !== previous.growth || (updated.growthTied && !updated.growthChosen && !previous.growthTied)) {
+        state.unlocked = false;
+      }
+    }
     input.closest('.statement').classList.remove('statement--missing');
     saveState();
     update();
@@ -553,7 +606,7 @@ function bindQuestion() {
       go('question', state.step + 1);
     } else {
       track.quizCompleted();
-      go(state.unlocked ? 'results' : 'gate');
+      go(reviewMode && results().growthTied ? 'tie' : state.unlocked ? 'results' : 'gate');
     }
   });
 
@@ -561,6 +614,21 @@ function bindQuestion() {
     if (state.step === 0) go('about', 0);
     else go('question', state.step - 1);
   });
+}
+
+function bindTie() {
+  const form = $main.querySelector('[data-growth-choice]');
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const choice = new FormData(form).get('growth-pillar');
+    const current = results();
+    if (!current.growthOptions.includes(choice)) return;
+    if (current.growth !== choice) state.unlocked = false;
+    state.growthChoice = choice;
+    if (reviewMode) go('results');
+    else go('gate');
+  });
+  form.querySelector('[data-action="back"]').addEventListener('click', () => go('question', PILLARS.length - 1));
 }
 
 function bindGate() {
@@ -608,7 +676,7 @@ function bindGate() {
     if (formRendered || blocked.hidden) return; // the form is available, so the skip no longer applies
     reveal();
   });
-  $main.querySelector('[data-action="back"]').addEventListener('click', () => go('question', PILLARS.length - 1));
+  $main.querySelector('[data-action="back"]').addEventListener('click', () => go(r.growthTied ? 'tie' : 'question', PILLARS.length - 1));
 }
 
 function bindResults() {
@@ -658,9 +726,13 @@ $main.addEventListener('click', (e) => {
 
 function showReviewScreen(screen, step = 0) {
   state.unlocked = screen === 'results';
+  state.growthChoice = null;
   state.answers = screen === 'results'
     ? Object.fromEntries(ORDER.map((slug, index) => [slug, Array(STATEMENTS_PER_PILLAR).fill(index === step ? 2 : index === (step + 1) % ORDER.length ? 5 : 4)]))
     : emptyAnswers();
+  if (screen === 'tie') {
+    state.answers = Object.fromEntries(ORDER.map((slug, index) => [slug, Array(STATEMENTS_PER_PILLAR).fill(step === 1 || index < 2 ? 3 : 4)]));
+  }
   go(screen, screen === 'question' ? step : PILLARS.length - 1);
 }
 
@@ -676,6 +748,8 @@ function setupReviewMode() {
       <option value="intro">Intro</option>
       <option value="about">Pillars Overview</option>
       <optgroup label="Question Pages">${options('question')}</optgroup>
+      <option value="tie:0">Growth Tie — Two Pillars</option>
+      <option value="tie:1">Growth Tie — All Five Pillars</option>
       <option value="gate">Signup Preview</option>
       <optgroup label="Sample Results by Growth Pillar">${options('results')}</optgroup>
     </select>

@@ -2,10 +2,10 @@
 //
 // Rules (see CLAUDE.md):
 // - Pillar score = sum of its 5 ratings (5–25).
-// - Growth = lowest score; ties go to the pillar earliest in framework order.
+// - Growth = lowest score; a valid user choice wins a tie; framework order supplies a fallback.
 //   Any other pillar tied for lowest is "also worth your attention".
 // - Foundation = highest score excluding the growth pillar; same tie-break.
-// - All equal: growth = first pillar, foundation = second pillar, nothing "also worth attention".
+// - All equal: use the chosen Growth Pillar if present, with no "also worth attention" list.
 
 export const STATEMENTS_PER_PILLAR = 5;
 
@@ -31,14 +31,14 @@ export function isPillarComplete(answers, slug) {
  * Pick growth / foundation pillars.
  * @param {Object<string, number>} scores slug -> score
  * @param {string[]} order slugs in framework order (tie-break order)
- * @returns {{growth: string, foundation: string, alsoAttention: string[],
- *   allEqual: boolean, growthTied: boolean, foundationTied: boolean}}
+ * @param {string|null} growthChoice optional choice from the tied lowest pillars
  */
-export function pickPillars(scores, order) {
-  let growth = order[0];
-  for (const slug of order) {
-    if (scores[slug] < scores[growth]) growth = slug; // strict: earliest wins ties
-  }
+export function pickPillars(scores, order, growthChoice = null) {
+  const lowest = Math.min(...order.map((slug) => scores[slug]));
+  const growthOptions = order.filter((slug) => scores[slug] === lowest);
+  const growthTied = growthOptions.length > 1;
+  const growthChosen = growthTied && growthOptions.includes(growthChoice);
+  const growth = growthChosen ? growthChoice : growthOptions[0];
 
   let foundation = null;
   for (const slug of order) {
@@ -54,17 +54,14 @@ export function pickPillars(scores, order) {
     (slug) => slug !== growth && slug !== foundation && scores[slug] === scores[growth],
   );
 
-  // Which picks were decided by the framework-order tie-break rather than a clear score.
-  const growthTied = order.some((slug) => slug !== growth && scores[slug] === scores[growth]);
-  const foundationTied = order.some(
-    (slug) => slug !== growth && slug !== foundation && scores[slug] === scores[foundation],
-  );
+  const foundationPeers = order.filter((slug) => slug !== growth && slug !== foundation && scores[slug] === scores[foundation]);
+  const foundationTied = foundationPeers.length > 0;
 
-  return { growth, foundation, alsoAttention, allEqual, growthTied, foundationTied };
+  return { growth, foundation, alsoAttention, allEqual, growthOptions, growthTied, growthChosen, foundationTied, foundationPeers };
 }
 
 /** Convenience: answers -> full results object. */
-export function computeResults(answers, order) {
+export function computeResults(answers, order, growthChoice = null) {
   const scores = scorePillars(answers, order);
-  return { scores, ...pickPillars(scores, order) };
+  return { scores, ...pickPillars(scores, order, growthChoice) };
 }
