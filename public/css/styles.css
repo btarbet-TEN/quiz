@@ -94,6 +94,7 @@
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 
   --gutter: 16px;
+  --content-width: 1040px;
   --radius: 14px;
   --cookie-h: 0px;           /* set by JS while the cookie bar is visible */
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -160,7 +161,7 @@ a { color: var(--ink); text-underline-offset: 0.18em; }
 
 :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 
-/* --- Decorative mint shapes (tablet and up) ------------------------------ */
+/* --- Decorative mint shapes --------------------------------------------- */
 .decor {
   position: fixed;
   inset: 0;
@@ -171,25 +172,33 @@ a { color: var(--ink); text-underline-offset: 0.18em; }
 }
 .decor span { position: absolute; background: var(--mint); }
 .decor .d-circle { border-radius: 50%; }
-
-@media (min-width: 768px) {
-  .decor { display: block; }
-  .decor .d-circle--a { width: 220px; height: 220px; top: -90px; right: -70px; }
-  .decor .d-circle--b { width: 90px; height: 90px; bottom: 12%; left: -45px; }
-  .decor .d-block { width: 14px; height: 38vh; top: 22vh; left: 0; }
-}
-@media (min-width: 1100px) {
-  .decor .d-circle--a { width: calc((100vw - 720px) / 2 + 40px); height: auto; aspect-ratio: 1; max-width: 520px; top: -10vh; right: calc(-1 * min(14vw, 180px)); }
-  .decor .d-circle--b { width: 200px; height: 200px; bottom: -60px; left: calc((100vw - 720px) / 2 - 260px); }
-  .decor .d-block { width: calc((100vw - 720px) / 2 - 120px); max-width: 300px; height: 46vh; top: 30vh; left: 0; }
-  .decor .d-block--b { display: block; width: 120px; height: 12px; right: 6vw; bottom: 22vh; left: auto; top: auto; }
-
-  /* Results are wider (~1040px); keep shapes in the margins. */
-  body[data-screen="results"] .decor .d-circle--a { width: 300px; top: -120px; right: -120px; }
-  body[data-screen="results"] .decor .d-block { width: 18px; }
-  body[data-screen="results"] .decor .d-circle--b { left: -100px; }
-}
 .decor .d-block--b { display: none; }
+
+@media (min-width: 1160px) {
+  .decor {
+    display: block;
+    /* Use the same content width as the screens and leave one gutter clear. */
+    --decor-margin: calc((100% - var(--content-width)) / 2 - var(--gutter));
+  }
+  .decor .d-circle--a {
+    width: clamp(220px, 28vw, 520px);
+    aspect-ratio: 1;
+    top: -10vh;
+    left: calc(100% - var(--decor-margin));
+  }
+  .decor .d-circle--b {
+    width: 200px;
+    height: 200px;
+    bottom: -60px;
+    right: calc(100% - var(--decor-margin));
+  }
+  .decor .d-block {
+    width: min(300px, var(--decor-margin));
+    height: 46vh;
+    top: 30vh;
+    left: 0;
+  }
+}
 
 /* --- Header -------------------------------------------------------------- */
 .site-header {
@@ -198,7 +207,7 @@ a { color: var(--ink); text-underline-offset: 0.18em; }
   padding: 14px var(--gutter);
   padding-top: max(14px, env(safe-area-inset-top));
 }
-.site-header__inner { max-width: 1040px; margin: 0 auto; display: flex; align-items: center; }
+.site-header__inner { max-width: var(--content-width); margin: 0 auto; display: flex; align-items: center; }
 .logo { display: inline-flex; line-height: 0; }
 .logo img { height: 28px; width: auto; }
 @media (min-width: 768px) { .logo img { height: 34px; } }
@@ -233,9 +242,9 @@ main {
 main:focus { outline: none; }
 
 .screen { max-width: 720px; margin: 0 auto; }
-.screen--results { max-width: 1040px; }
+.screen--results { max-width: var(--content-width); }
 @media (min-width: 768px) {
-  .screen { max-width: 1040px; }
+  .screen { max-width: var(--content-width); }
 }
 
 .lead { font-size: clamp(1.05rem, 1rem + 0.4vw, 1.25rem); line-height: 1.55; }
@@ -711,7 +720,7 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
   border-top: 1px solid var(--rule);
   background: var(--white);
 }
-.site-footer__inner { max-width: 1040px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; text-align: center; }
+.site-footer__inner { max-width: var(--content-width); margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; text-align: center; }
 .site-footer p { margin: 0; }
 .site-footer nav { display: flex; flex-wrap: wrap; justify-content: center; }
 .site-footer__item { display: inline-flex; align-items: center; }
@@ -733,7 +742,7 @@ body.has-cookie-bar .quiz-nav { padding-bottom: 10px; }
   font-size: 0.875rem;
   line-height: 1.45;
 }
-.cookie-bar__inner { max-width: 1040px; margin: 0 auto; display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; justify-content: space-between; }
+.cookie-bar__inner { max-width: var(--content-width); margin: 0 auto; display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; justify-content: space-between; }
 .cookie-bar p { margin: 0; flex: 1 1 260px; }
 .cookie-bar a { color: var(--white); }
 .cookie-bar .btn { min-height: 44px; padding: 0.5em 1.4em; background: var(--mint); border-color: var(--mint); color: var(--ink); }
